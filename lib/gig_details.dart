@@ -3,6 +3,7 @@ import 'globals.dart' as globals;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'app_home.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class BandInfo {
   String bandName;
@@ -190,47 +191,47 @@ class GigDetailsState extends State<GigDetails> {
   }
 
   //for updating user status
-  IconData newValue = globals.currentPlanIcon;
+  Widget newValue = globals.currentPlanIcon;
   String yourStatus = globals.currentPlanDescription;
   int newStatus;
   statusButtons() {
-    return new DropdownButton<IconData>(
-      items: <IconData>[
-        Icons.more,
-        Icons.check_circle,
-        Icons.check_circle_outline,
-        Icons.hearing,
-        Icons.error,
-        Icons.cancel,
-        Icons.sentiment_dissatisfied
-      ].map((IconData val) {
-        return new DropdownMenuItem<IconData>(
+    return new DropdownButton<Widget>(
+      items: <Widget>[
+        needsValuePlanIconFormatted,
+        definitelyPlanIconFormatted,
+        probablyPlanIconFormatted,
+        dontKnowPlanIconFormatted,
+        probablyNotPlanIconFormatted,
+        cantDoItPlanIconFormatted,
+        notInterestedPlanIconFormatted,
+      ].map((Widget val) {
+        return new DropdownMenuItem<Widget>(
           value: val,
-          child: new Icon(val),
+          child: val,
         );
       }).toList(),
       value: newValue,
       onChanged: (val) {
         newValue = val;
-        if (val == Icons.more) {
+        if (val == needsValuePlanIconFormatted) {
           yourStatus = "Needs Input";
           newStatus = 0;
-        } else if (val == Icons.check_circle) {
+        } else if (val == definitelyPlanIconFormatted) {
           yourStatus = "Definitely!";
           newStatus = 1;
-        } else if (val == Icons.check_circle_outline) {
+        } else if (val == probablyPlanIconFormatted) {
           yourStatus = "Probably";
           newStatus = 2;
-        } else if (val == Icons.hearing) {
+        } else if (val == dontKnowPlanIconFormatted) {
           yourStatus = "Don't Know";
           newStatus = 3;
-        } else if (val == Icons.error) {
+        } else if (val == probablyNotPlanIconFormatted) {
           yourStatus = "Probably Not";
           newStatus = 4;
-        } else if (val == Icons.cancel) {
+        } else if (val == cantDoItPlanIconFormatted) {
           yourStatus = "Can't Do It";
           newStatus = 5;
-        } else if (val == Icons.sentiment_dissatisfied) {
+        } else if (val == notInterestedPlanIconFormatted) {
           yourStatus = "Not Interested";
           newStatus = 6;
         }

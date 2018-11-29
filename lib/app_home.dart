@@ -4,6 +4,7 @@ import 'gig_details.dart';
 import 'globals.dart' as globals;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 String cleanedDate;
 var statusIcon;
@@ -22,6 +23,15 @@ cleanDate(date) {
   globals.currentGigDate = cleanedDate;
 }
 
+Widget cancelledStatusIconFormatted =
+    Icon(FontAwesomeIcons.solidTimesCircle, size: 25.0, color: Colors.red);
+
+Widget confirmedStatusIconFormatted =
+    Icon(FontAwesomeIcons.solidCheckCircle, size: 25.0, color: Colors.green);
+
+Widget pendingStatusIconFormatted = Icon(FontAwesomeIcons.solidQuestionCircle,
+    size: 25.0, color: Colors.yellow);
+
 //gig status icons
 statusIcons(status) {
   /*
@@ -30,13 +40,53 @@ statusIcons(status) {
   2 - Cancelled
   */
   if (status == "2") {
-    return Icon(Icons.cancel, size: 30.0, color: Colors.red);
+    return cancelledStatusIconFormatted;
   } else if (status == "1") {
-    return Icon(Icons.check_circle, size: 30.0, color: Colors.green);
+    return confirmedStatusIconFormatted;
   } else {
-    return Icon(Icons.more, size: 30.0, color: Colors.white);
+    return pendingStatusIconFormatted;
   }
 }
+
+Widget needsValuePlanIconFormatted = Icon(
+  FontAwesomeIcons.minus,
+  size: 25.0,
+);
+
+Widget definitelyPlanIconFormatted = Icon(
+  FontAwesomeIcons.solidCircle,
+  size: 25.0,
+  color: Colors.green,
+);
+
+Widget probablyPlanIconFormatted = Icon(
+  FontAwesomeIcons.circle,
+  size: 25.0,
+  color: Colors.green,
+);
+
+Widget dontKnowPlanIconFormatted = Icon(
+  FontAwesomeIcons.question,
+  size: 25.0,
+  color: Colors.grey,
+);
+
+Widget probablyNotPlanIconFormatted = Icon(
+  FontAwesomeIcons.square,
+  size: 25.0,
+  color: Colors.red,
+);
+
+Widget cantDoItPlanIconFormatted = Icon(
+  FontAwesomeIcons.solidSquare,
+  size: 25.0,
+  color: Colors.red,
+);
+
+Widget notInterestedPlanIconFormatted = Icon(
+  FontAwesomeIcons.times,
+  size: 25.0,
+);
 
 //user status icons
 planValueIcons(value) {
@@ -50,19 +100,19 @@ planValueIcons(value) {
   6 - Not Interested
   */
   if (value == "0") {
-    return Icon(Icons.more, size: 30.0, color: Colors.white);
+    return needsValuePlanIconFormatted;
   } else if (value == "1") {
-    return Icon(Icons.check_circle, size: 30.0, color: Colors.green);
+    return definitelyPlanIconFormatted;
   } else if (value == "2") {
-    return Icon(Icons.check_circle_outline, size: 30.0, color: Colors.green);
+    return probablyPlanIconFormatted;
   } else if (value == "3") {
-    return Icon(Icons.hearing, size: 30.0, color: Colors.white);
+    return dontKnowPlanIconFormatted;
   } else if (value == "4") {
-    return Icon(Icons.error, size: 30.0, color: Colors.redAccent);
+    return probablyNotPlanIconFormatted;
   } else if (value == "5") {
-    return Icon(Icons.cancel, size: 30.0, color: Colors.red);
+    return cantDoItPlanIconFormatted;
   } else {
-    return Icon(Icons.sentiment_dissatisfied, size: 30.0, color: Colors.white);
+    return notInterestedPlanIconFormatted;
   }
 }
 
@@ -78,19 +128,19 @@ planValueIconsNoFormat(value) {
   6 - Not Interested
   */
   if (value == "0") {
-    return Icons.more;
+    return needsValuePlanIconFormatted;
   } else if (value == "1") {
-    return Icons.check_circle;
+    return definitelyPlanIconFormatted;
   } else if (value == "2") {
-    return Icons.check_circle_outline;
+    return probablyPlanIconFormatted;
   } else if (value == "3") {
-    return Icons.hearing;
+    return dontKnowPlanIconFormatted;
   } else if (value == "4") {
-    return Icons.error;
+    return probablyNotPlanIconFormatted;
   } else if (value == "5") {
-    return Icons.cancel;
+    return cantDoItPlanIconFormatted;
   } else {
-    return Icons.sentiment_dissatisfied;
+    return notInterestedPlanIconFormatted;
   }
 }
 
