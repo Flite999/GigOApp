@@ -33,6 +33,7 @@ class GigInfo {
   String gigPostGig;
   String gigDetails;
   String gigTitle;
+  String gigSetList;
 
   GigInfo(
       {this.gigBand,
@@ -47,7 +48,8 @@ class GigInfo {
       this.gigPaid,
       this.gigPostGig,
       this.gigSetTime,
-      this.gigTitle});
+      this.gigTitle,
+      this.gigSetList});
 
   factory GigInfo.fromJson(Map<String, dynamic> json) {
     return GigInfo(
@@ -63,7 +65,8 @@ class GigInfo {
         gigLeader: json["leader"],
         gigPostGig: json["postgig"],
         gigDetails: json["details"],
-        gigTitle: json["title"]);
+        gigTitle: json["title"],
+        gigSetList: json["setlist"]);
   }
 }
 
@@ -307,6 +310,9 @@ class GigDetailsState extends State<GigDetails> {
                         Divider(),
                         gigTextHeader("Details"),
                         gigText(snapshot.data.gigDetails),
+                        Divider(),
+                        gigTextHeader("SetList"),
+                        gigText(snapshot.data.gigSetList),
                         Divider(),
                         gigTextHeader("Your Status: "),
                         Container(
