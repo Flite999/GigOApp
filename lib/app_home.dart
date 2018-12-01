@@ -309,10 +309,16 @@ class MyHomePageState extends State<MyHomePage> {
                   itemBuilder: (content, index) {
                     return new Column(children: <Widget>[
                       Container(
-                        margin: EdgeInsets.all(10.0),
+                        margin: EdgeInsets.only(
+                            top: 15.0, bottom: 10.0, left: 5.0, right: 5.0),
                         child: new Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
+                              Container(
+                                alignment: Alignment.centerLeft,
+                                margin: EdgeInsets.only(left: 10.0, right: 5.0),
+                                child: statusIcons(snapshot.data[index].status),
+                              ),
                               Expanded(
                                 child: Container(
                                   alignment: Alignment.centerLeft,
@@ -352,15 +358,11 @@ class MyHomePageState extends State<MyHomePage> {
                             ]),
                       ),
                       Container(
+                        padding: EdgeInsets.only(left: 15.0),
                         child: new Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              Container(
-                                margin:
-                                    EdgeInsets.only(left: 10.0, right: 10.0),
-                                child: statusIcons(snapshot.data[index].status),
-                              ),
-                              new Divider(),
+                              //new Divider(),
                               Container(
                                   child: Expanded(
                                 child: Text(snapshot.data[index].date,
