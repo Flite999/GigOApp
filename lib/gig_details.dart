@@ -274,7 +274,7 @@ class GigDetailsState extends State<GigDetails> {
         ]),
       ),
       body: Container(
-          color: Color.fromRGBO(150, 248, 157, 1.0),
+          color: Colors.white,
           padding: EdgeInsets.all(10.0),
           child: FutureBuilder<GigInfo>(
             future: fetchGigInfo(),
@@ -299,11 +299,11 @@ class GigDetailsState extends State<GigDetails> {
                           ),
                         ),
                         Divider(),
-                        gigText(globals.currentGigDate),
+                        gigText(globals.currentGigDate, "Gig Date"),
                         gigText(snapshot.data.gigCallTime, "Call Time"),
                         gigText(snapshot.data.gigSetTime, "Set Time"),
                         gigText(snapshot.data.gigEndTime, "End Time"),
-                        gigText(snapshot.data.gigAddress),
+                        gigText(snapshot.data.gigAddress, "Gig Address"),
                         gigText(snapshot.data.gigPaid, "Pay"),
                         gigText(snapshot.data.gigLeader, "Leader"),
                         gigText(snapshot.data.gigPostGig, "Post-Gig Plans"),
