@@ -467,7 +467,10 @@ class MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               ListTile(
-                title: Text('Log Out', style: TextStyle(fontSize: 18.0)),
+                title: Text('Log Out',
+                    style: TextStyle(
+                        color: Color.fromRGBO(14, 39, 96, 1.0),
+                        fontSize: 18.0)),
                 onTap: () {
                   postLogout();
                   Navigator.push(
@@ -475,6 +478,11 @@ class MyHomePageState extends State<MyHomePage> {
                     MaterialPageRoute(builder: (context) => LoginPage()),
                   );
                 },
+              ),
+              Container(
+                padding: EdgeInsets.only(left: 15.0),
+                alignment: Alignment.bottomLeft,
+                child: Text("App Version: 0.1"),
               ),
             ],
           ),
