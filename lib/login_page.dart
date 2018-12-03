@@ -154,7 +154,7 @@ class _LoginPageState extends State<LoginPage> {
     return [
       new RaisedButton(
           child: new Text('Login',
-              style: new TextStyle(fontSize: 20.0, color: Colors.black)),
+              style: new TextStyle(fontSize: 20.0, color: Colors.white)),
           color: Colors.blue,
           shape: new RoundedRectangleBorder(
               borderRadius: new BorderRadius.circular(15.0)),

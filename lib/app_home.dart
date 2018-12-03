@@ -307,87 +307,106 @@ class MyHomePageState extends State<MyHomePage> {
               return new ListView.builder(
                   itemCount: snapshot.data.length,
                   itemBuilder: (content, index) {
-                    return new Column(children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.only(
-                            top: 15.0, bottom: 10.0, left: 5.0, right: 5.0),
-                        child: new Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Container(
-                                alignment: Alignment.centerLeft,
-                                margin: EdgeInsets.only(left: 10.0, right: 5.0),
-                                child: statusIcons(snapshot.data[index].status),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  alignment: Alignment.centerLeft,
-                                  child: FlatButton(
-                                      child: Text(snapshot.data[index].title,
-                                          softWrap: true,
-                                          style: TextStyle(
-                                              fontSize: 15.0,
-                                              fontWeight: FontWeight.bold)),
-                                      onPressed: () {
-                                        //To Gig Details->global variables passed from here to specific gig details
-                                        globals.currentBandID =
-                                            snapshot.data[index].bandID;
-                                        globals.currentPlanComment =
-                                            snapshot.data[index].planComment;
-                                        globals.currentPlanID =
-                                            snapshot.data[index].planID;
-                                        globals.currentPlanDescription =
-                                            snapshot.data[index].planValueLabel;
-                                        globals.currentPlanIcon =
-                                            planValueIconsNoFormat(
-                                                snapshot.data[index].planValue);
-                                        globals.currentPlanValue =
-                                            snapshot.data[index].planValue;
-                                        globals.currentGigTitle =
-                                            snapshot.data[index].title;
-                                        globals.currentGigID =
-                                            snapshot.data[index].gigID;
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    GigDetails()));
-                                      }),
-                                ),
-                              ),
-                            ]),
-                      ),
-                      Container(
-                        padding: EdgeInsets.only(left: 15.0),
-                        child: new Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              //new Divider(),
-                              Container(
-                                  child: Expanded(
-                                child: Text(snapshot.data[index].date,
-                                    softWrap: true,
-                                    style: TextStyle(
-                                        fontSize: 15.0,
-                                        fontWeight: FontWeight.bold)),
-                              )),
-                              new Divider(),
-                              Container(
-                                child: planValueIcons(
-                                    snapshot.data[index].planValue),
-                              ),
-                              new Divider(),
-                              Expanded(
-                                child: Container(
-                                  padding: EdgeInsets.all(5.0),
-                                  margin: EdgeInsets.only(left: 5.0),
-                                  child: new Text(
-                                      snapshot.data[index].planComment),
-                                ),
-                              )
-                            ]),
-                      ),
-                    ]);
+                    return new Container(
+                        margin: EdgeInsets.only(bottom: 5.0),
+                        decoration: new BoxDecoration(
+                          border: new Border(
+                            left: new BorderSide(
+                                color: Colors.grey,
+                                width: 5.0,
+                                style: BorderStyle.solid),
+                          ),
+                        ),
+                        child: new Column(children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.only(
+                                top: 15.0, bottom: 10.0, left: 5.0, right: 5.0),
+                            child: new Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    alignment: Alignment.centerLeft,
+                                    margin:
+                                        EdgeInsets.only(left: 10.0, right: 5.0),
+                                    child: statusIcons(
+                                        snapshot.data[index].status),
+                                  ),
+                                  Expanded(
+                                    child: Container(
+                                      alignment: Alignment.centerLeft,
+                                      child: FlatButton(
+                                          child: Text(
+                                              snapshot.data[index].title,
+                                              softWrap: true,
+                                              style: TextStyle(
+                                                  color: Color.fromRGBO(
+                                                      14, 39, 96, 1.0),
+                                                  fontSize: 17.0,
+                                                  fontWeight: FontWeight.bold)),
+                                          onPressed: () {
+                                            //To Gig Details->global variables passed from here to specific gig details
+                                            globals.currentBandID =
+                                                snapshot.data[index].bandID;
+                                            globals.currentPlanComment =
+                                                snapshot
+                                                    .data[index].planComment;
+                                            globals.currentPlanID =
+                                                snapshot.data[index].planID;
+                                            globals.currentPlanDescription =
+                                                snapshot
+                                                    .data[index].planValueLabel;
+                                            globals.currentPlanIcon =
+                                                planValueIconsNoFormat(snapshot
+                                                    .data[index].planValue);
+                                            globals.currentPlanValue =
+                                                snapshot.data[index].planValue;
+                                            globals.currentGigTitle =
+                                                snapshot.data[index].title;
+                                            globals.currentGigID =
+                                                snapshot.data[index].gigID;
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        GigDetails()));
+                                          }),
+                                    ),
+                                  ),
+                                ]),
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(left: 15.0),
+                            child: new Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  //new Divider(),
+                                  Container(
+                                      child: Expanded(
+                                    child: Text(snapshot.data[index].date,
+                                        softWrap: true,
+                                        style: TextStyle(
+                                          fontSize: 15.0,
+                                        )),
+                                  )),
+                                  new Divider(),
+                                  Container(
+                                    child: planValueIcons(
+                                        snapshot.data[index].planValue),
+                                  ),
+                                  new Divider(),
+                                  Expanded(
+                                    child: Container(
+                                      padding: EdgeInsets.all(5.0),
+                                      margin: EdgeInsets.only(left: 5.0),
+                                      child: new Text(
+                                          snapshot.data[index].planComment),
+                                    ),
+                                  )
+                                ]),
+                          ),
+                        ]));
+                    //return new Column(children: <Widget>[
                   });
             } else if (snapshot.hasError) {
               return new Text("${snapshot.error}");
@@ -411,7 +430,7 @@ class MyHomePageState extends State<MyHomePage> {
       ),
       body: Container(
         padding: EdgeInsets.only(left: 10.0, right: 10.0),
-        color: Color.fromRGBO(150, 248, 157, 1.0),
+        color: Colors.white,
         child: Column(
           children: [
             Flexible(
@@ -441,7 +460,7 @@ class MyHomePageState extends State<MyHomePage> {
                 height: 120.0,
                 child: DrawerHeader(
                   child: Text('Menu',
-                      style: TextStyle(color: Colors.black, fontSize: 18.0)),
+                      style: TextStyle(color: Colors.white, fontSize: 18.0)),
                   decoration: BoxDecoration(
                     color: Colors.blue,
                   ),
