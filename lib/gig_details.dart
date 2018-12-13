@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'app_home.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:async/async.dart';
 
 class BandInfo {
   String bandName;
@@ -141,6 +142,40 @@ Future<GigInfo> fetchGigInfo() async {
   }
 }
 
+List memberList = [];
+
+Future<List> fetchGigMemberInfo() async {
+  try {
+    final response = await http.get(
+        'https://www.gig-o-matic.com/api/gig/plans/${globals.currentGigID}',
+        headers: {"cookie": "${globals.cleanedCookie}"});
+    var decoded = json.decode(response.body.toString());
+    List responseJSON = decoded;
+    List newList = [];
+
+    for (int i = 0; i < responseJSON.length; i++) {
+      Map newMap = {};
+      String name = responseJSON[i]["the_member_name"];
+      newMap["name"] = name;
+      //String section = responseJSON[i]["the_plan"]["section"];
+      //newList.add({"section": section});
+      String value = responseJSON[i]["the_plan"]["value"].toString();
+      newMap["value"] = value;
+
+      String comment = responseJSON[i]["the_plan"]["comment"];
+      if (comment != null) {
+        newMap["comment"] = comment;
+      }
+
+      newList.add(newMap);
+    }
+
+    return newList;
+  } catch (e) {
+    print(e);
+  }
+}
+
 //user can update their status for a gig
 Future putStatus(newValue) async {
   try {
@@ -191,6 +226,12 @@ class GigDetailsState extends State<GigDetails> {
   void initState() {
     commentController =
         new TextEditingController(text: globals.currentPlanComment);
+
+    fetchGigMemberInfo().then((result) {
+      setState(() {
+        memberList = result;
+      });
+    });
   }
 
   //for updating user status
@@ -338,6 +379,45 @@ class GigDetailsState extends State<GigDetails> {
                                   border: OutlineInputBorder(),
                                   filled: true,
                                   fillColor: Colors.white)),
+                        ),
+                        Divider(),
+                        gigTextHeader("Plans"),
+                        ListView.builder(
+                          //need the physics property set otherwise you will hit an infinity error and can't scroll up!
+                          physics: ClampingScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: memberList.length,
+                          itemBuilder: (context, index) {
+                            return Container(
+                                padding: EdgeInsets.only(left: 5.0),
+                                child: Column(children: <Widget>[
+                                  Container(
+                                    child: Row(
+                                      children: <Widget>[
+                                        Container(
+                                          margin: EdgeInsets.only(right: 15.0),
+                                          child: Text(
+                                            '${memberList[index]["name"]}',
+                                            style: TextStyle(fontSize: 20.0),
+                                          ),
+                                        ),
+                                        Container(
+                                          child: planValueIcons(
+                                              '${memberList[index]["value"]}'),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    alignment: Alignment.centerLeft,
+                                    margin: EdgeInsets.only(
+                                        top: 10.0, bottom: 10.0),
+                                    child: Text(
+                                        '${memberList[index]["comment"]}',
+                                        style: TextStyle(fontSize: 15.0)),
+                                  ),
+                                ]));
+                          },
                         ),
                       ],
                     ),
