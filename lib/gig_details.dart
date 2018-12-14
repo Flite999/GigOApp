@@ -382,6 +382,7 @@ class GigDetailsState extends State<GigDetails> {
                         ),
                         Divider(),
                         gigTextHeader("Plans"),
+                        Container(margin: EdgeInsets.only(bottom: 20.0)),
                         ListView.builder(
                           //need the physics property set otherwise you will hit an infinity error and can't scroll up!
                           physics: ClampingScrollPhysics(),
