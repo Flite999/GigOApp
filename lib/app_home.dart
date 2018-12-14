@@ -189,6 +189,7 @@ class Gig {
   String planID;
   String gigID;
   String bandID;
+  String bandShortName;
 
   Gig({
     this.title,
@@ -200,6 +201,7 @@ class Gig {
     this.planID,
     this.gigID,
     this.bandID,
+    this.bandShortName,
   });
 }
 
@@ -222,6 +224,7 @@ List<Gig> createGigList(List data, List data2) {
     }
     String gigID = data[i]["gig"]["id"];
     String bandID = data[i]["gig"]["band"].toString();
+    String bandShortName = data[i]["band"]["shortname"];
 
     Gig gig = new Gig(
       title: title,
@@ -233,6 +236,7 @@ List<Gig> createGigList(List data, List data2) {
       planID: planID,
       gigID: gigID,
       bandID: bandID,
+      bandShortName: bandShortName,
     );
     list.add(gig);
   }
@@ -253,6 +257,7 @@ List<Gig> createGigList(List data, List data2) {
     }
     String gigID = data2[i]["gig"]["id"];
     String bandID = data2[i]["gig"]["band"].toString();
+    String bandShortName = data[i]["band"]["shortname"];
 
     Gig gig = new Gig(
       title: title,
@@ -264,6 +269,7 @@ List<Gig> createGigList(List data, List data2) {
       planID: planID,
       gigID: gigID,
       bandID: bandID,
+      bandShortName: bandShortName,
     );
     list.add(gig);
   }
@@ -321,58 +327,54 @@ class MyHomePageState extends State<MyHomePage> {
                           Container(
                             margin: EdgeInsets.only(
                                 top: 15.0, bottom: 10.0, left: 5.0, right: 5.0),
-                            child: new Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    alignment: Alignment.centerLeft,
-                                    margin:
-                                        EdgeInsets.only(left: 10.0, right: 5.0),
-                                    child: statusIcons(
-                                        snapshot.data[index].status),
-                                  ),
-                                  Expanded(
-                                    child: Container(
-                                      alignment: Alignment.centerLeft,
-                                      child: FlatButton(
-                                          child: Text(
-                                              snapshot.data[index].title,
-                                              softWrap: true,
-                                              style: TextStyle(
-                                                  color: Color.fromRGBO(
-                                                      14, 39, 96, 1.0),
-                                                  fontSize: 17.0,
-                                                  fontWeight: FontWeight.bold)),
-                                          onPressed: () {
-                                            //To Gig Details->global variables passed from here to specific gig details
-                                            globals.currentBandID =
-                                                snapshot.data[index].bandID;
-                                            globals.currentPlanComment =
-                                                snapshot
-                                                    .data[index].planComment;
-                                            globals.currentPlanID =
-                                                snapshot.data[index].planID;
-                                            globals.currentPlanDescription =
-                                                snapshot
-                                                    .data[index].planValueLabel;
-                                            globals.currentPlanIcon =
-                                                planValueIconsNoFormat(snapshot
-                                                    .data[index].planValue);
-                                            globals.currentPlanValue =
-                                                snapshot.data[index].planValue;
-                                            globals.currentGigTitle =
-                                                snapshot.data[index].title;
-                                            globals.currentGigID =
-                                                snapshot.data[index].gigID;
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        GigDetails()));
-                                          }),
-                                    ),
-                                  ),
-                                ]),
+                            child: new Row(children: [
+                              Container(
+                                alignment: Alignment.centerLeft,
+                                margin: EdgeInsets.only(left: 10.0, right: 5.0),
+                                child: statusIcons(snapshot.data[index].status),
+                              ),
+                              Expanded(
+                                child: Container(
+                                  alignment: Alignment.centerLeft,
+                                  child: FlatButton(
+                                      child: Text(snapshot.data[index].title,
+                                          softWrap: true,
+                                          style: TextStyle(
+                                              color: Color.fromRGBO(
+                                                  14, 39, 96, 1.0),
+                                              fontSize: 17.0,
+                                              fontWeight: FontWeight.bold)),
+                                      onPressed: () {
+                                        //To Gig Details->global variables passed from here to specific gig details
+                                        globals.currentBandID =
+                                            snapshot.data[index].bandID;
+                                        globals.currentPlanComment =
+                                            snapshot.data[index].planComment;
+                                        globals.currentPlanID =
+                                            snapshot.data[index].planID;
+                                        globals.currentPlanDescription =
+                                            snapshot.data[index].planValueLabel;
+                                        globals.currentPlanIcon =
+                                            planValueIconsNoFormat(
+                                                snapshot.data[index].planValue);
+                                        globals.currentPlanValue =
+                                            snapshot.data[index].planValue;
+                                        globals.currentGigTitle =
+                                            snapshot.data[index].title;
+                                        globals.currentGigID =
+                                            snapshot.data[index].gigID;
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    GigDetails()));
+                                      }),
+                                ),
+                              ),
+                              Container(
+                                  child: Text(
+                                      "(${snapshot.data[index].bandShortName})")),
+                            ]),
                           ),
                           Container(
                             padding: EdgeInsets.only(left: 15.0),
@@ -380,7 +382,6 @@ class MyHomePageState extends State<MyHomePage> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  //new Divider(),
                                   Container(
                                       child: Expanded(
                                     child: Text(snapshot.data[index].date,
