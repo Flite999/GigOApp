@@ -173,9 +173,18 @@ planValueLabelGenerator(value) {
 }
 
 postLogout() async {
+  print(globals.cleanedCookie);
   try {
-    await http.get('https://www.gig-o-matic.com/api/logout',
-        headers: {"cookie": "${globals.cleanedCookie}"});
+    await http.post('https://www.gig-o-matic.com/api/logout',
+        headers: {"cookie": "${globals.cleanedCookie}"}).then((response) {
+      if (response.statusCode == 200) {
+        //posting to the logout returns a cookie in an odd format, but we don't care about properly cleaning it,
+        //because the returned cookie is supposed to be invalid for next use anyways
+        cleanCookie(response.headers["set-cookie"]);
+      } else {
+        print('API call failed, response: ${response.statusCode}');
+      }
+    });
   } catch (e) {}
 }
 
@@ -281,6 +290,11 @@ Future<List<Gig>> fetchGigInfo() async {
   try {
     final response = await http.get('https://www.gig-o-matic.com/api/agenda',
         headers: {"cookie": "${globals.cleanedCookie}"});
+    if (response.statusCode == 200) {
+      cleanCookie(response.headers["set-cookie"]);
+    } else {
+      print('API call failed, response: ${response.statusCode}');
+    }
     Map decoded = json.decode(response.body.toString());
     List responseJSON = decoded["weighin_plans"];
     List responseJSON2 = decoded["upcoming_plans"];
@@ -289,7 +303,7 @@ Future<List<Gig>> fetchGigInfo() async {
 
     return gigList;
   } catch (e) {
-    print(e);
+    print("fetch Gig Info error: $e");
   }
 }
 

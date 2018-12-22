@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'app_home.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:async/async.dart';
+import 'login_page.dart';
 
 class BandInfo {
   String bandName;
@@ -136,6 +137,11 @@ Future<GigInfo> fetchGigInfo() async {
     final response = await http.get(
         'https://www.gig-o-matic.com/api/gig/${globals.currentGigID}',
         headers: {"cookie": "${globals.cleanedCookie}"});
+    if (response.statusCode == 200) {
+      cleanCookie(response.headers["set-cookie"]);
+    } else {
+      print('API call failed, response: ${response.statusCode}');
+    }
     return GigInfo.fromJson(json.decode(response.body));
   } catch (e) {
     print(e);
@@ -149,6 +155,11 @@ Future<List> fetchGigMemberInfo() async {
     final response = await http.get(
         'https://www.gig-o-matic.com/api/gig/plans/${globals.currentGigID}',
         headers: {"cookie": "${globals.cleanedCookie}"});
+    if (response.statusCode == 200) {
+      cleanCookie(response.headers["set-cookie"]);
+    } else {
+      print('API call failed, response: ${response.statusCode}');
+    }
     var decoded = json.decode(response.body.toString());
     List responseJSON = decoded;
     List newList = [];
@@ -157,6 +168,7 @@ Future<List> fetchGigMemberInfo() async {
       Map newMap = {};
       String name = responseJSON[i]["the_member_name"];
       newMap["name"] = name;
+      //commented out code for adding sections info later...
       //String section = responseJSON[i]["the_plan"]["section"];
       //newList.add({"section": section});
       String value = responseJSON[i]["the_plan"]["value"].toString();
@@ -181,7 +193,13 @@ Future putStatus(newValue) async {
   try {
     await http.put(
         'https://www.gig-o-matic.com/api/plan/${globals.currentPlanID}/value/$newValue',
-        headers: {"cookie": "${globals.cleanedCookie}"});
+        headers: {"cookie": "${globals.cleanedCookie}"}).then((response) {
+      if (response.statusCode == 200) {
+        cleanCookie(response.headers["set-cookie"]);
+      } else {
+        print('API call failed, response: ${response.statusCode}');
+      }
+    });
   } catch (e) {
     print(e);
   }
@@ -193,7 +211,13 @@ Future postComment(newComment) async {
     await http.post(
         'https://www.gig-o-matic.com/api/plan/${globals.currentPlanID}/comment',
         headers: {"cookie": "${globals.cleanedCookie}"},
-        body: {"comment": "$newComment"});
+        body: {"comment": "$newComment"}).then((response) {
+      if (response.statusCode == 200) {
+        cleanCookie(response.headers["set-cookie"]);
+      } else {
+        print('API call failed, response: ${response.statusCode}');
+      }
+    });
   } catch (e) {
     print(e);
   }
@@ -204,6 +228,11 @@ Future<BandInfo> fetchBandName(bandID) async {
     final response = await http.get(
         'https://www.gig-o-matic.com/api/band/$bandID',
         headers: {"cookie": "${globals.cleanedCookie}"});
+    if (response.statusCode == 200) {
+      cleanCookie(response.headers["set-cookie"]);
+    } else {
+      print('API call failed, response: ${response.statusCode}');
+    }
     return BandInfo.fromJson(json.decode(response.body));
   } catch (e) {
     print("Fetching Band Name from Band ID: $e");

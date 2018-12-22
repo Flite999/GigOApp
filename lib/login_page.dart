@@ -5,6 +5,16 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'globals.dart' as globals;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+//only get all characters up to semicolon
+cleanCookie(cookie) {
+  RegExp upToSemiColon = new RegExp(r".*(?=\;)");
+  String str = cookie;
+  //to use in all future API requests
+  globals.cleanedCookie = upToSemiColon.stringMatch(str).toString();
+  //saveSessionCookie(globals.cleanedCookie);
+}
 
 class LoginPage extends StatefulWidget {
   @override
@@ -18,7 +28,8 @@ class _LoginPageState extends State<LoginPage> {
   int authenticateReturnCode;
   String email;
   String password;
-  String cookie;
+  //var to store cookie for session persistence
+  String sessionCookie;
 
   launchSignUp() async {
     const url = "https://www.gig-o-matic.com/signup?locale=en";
@@ -47,14 +58,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  //only get all characters up to semicolon
-  cleanCookie(cookie) {
-    RegExp upToSemiColon = new RegExp(r".*(?=\;)");
-    String str = cookie;
-    //to use in all future API requests
-    globals.cleanedCookie = upToSemiColon.stringMatch(str).toString();
-  }
-
   void _showDialog() {
     showDialog(
       context: context,
@@ -72,6 +75,34 @@ class _LoginPageState extends State<LoginPage> {
             ]);
       },
     );
+  }
+
+  void initState() {
+    super.initState();
+    //loadSessionCookie();
+  }
+
+  //load saved cookie from memory, if returns 200 on a REST call, move to apphome (checking for valid session cookie)
+  loadSessionCookie() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      sessionCookie = (prefs.getString('sessionCookie') ?? 0);
+    });
+    await http.get('https://www.gig-o-matic.com/api/agenda',
+        headers: {"cookie": "$sessionCookie"}).then((response) {
+      if (response.statusCode == 200) {
+        globals.cleanedCookie = sessionCookie;
+        goToHomePage();
+      }
+    });
+  }
+
+  //save session cookie to memory
+  saveSessionCookie(sessionCookie) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      prefs.setString('sessionCookie', sessionCookie);
+    });
   }
 
   @override
@@ -102,14 +133,12 @@ class _LoginPageState extends State<LoginPage> {
           (response) {
         authenticateReturnCode = response.statusCode;
         if (authenticateReturnCode == 200) {
-          cookie = response.headers["set-cookie"];
-          cleanCookie(cookie);
+          cleanCookie(response.headers["set-cookie"]);
           goToHomePage();
         } else {
           print('Login failed. Please check username and password');
           _showDialog();
         }
-        print("Response status: $authenticateReturnCode");
       });
     } catch (e) {
       print('Error');
