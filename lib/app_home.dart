@@ -173,7 +173,7 @@ planValueLabelGenerator(value) {
 }
 
 postLogout() async {
-  print(globals.cleanedCookie);
+  //print(globals.cleanedCookie);
   try {
     await http.post('https://www.gig-o-matic.com/api/logout',
         headers: {"cookie": "${globals.cleanedCookie}"}).then((response) {
@@ -251,6 +251,7 @@ List<Gig> createGigList(List data, List data2) {
   }
 
   //Upcoming Plans
+
   for (int i = 0; i < data2.length; i++) {
     String title = data2[i]["gig"]["title"];
     String rawDate = data2[i]["gig"]["date"];
@@ -266,7 +267,7 @@ List<Gig> createGigList(List data, List data2) {
     }
     String gigID = data2[i]["gig"]["id"];
     String bandID = data2[i]["gig"]["band"].toString();
-    String bandShortName = data[i]["band"]["shortname"];
+    String bandShortName = data2[i]["band"]["shortname"];
 
     Gig gig = new Gig(
       title: title,
@@ -298,6 +299,7 @@ Future<List<Gig>> fetchGigInfo() async {
     Map decoded = json.decode(response.body.toString());
     List responseJSON = decoded["weighin_plans"];
     List responseJSON2 = decoded["upcoming_plans"];
+    //debugPrint(responseJSON2.toString());
 
     List<Gig> gigList = createGigList(responseJSON, responseJSON2);
 
