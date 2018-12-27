@@ -13,7 +13,6 @@ cleanCookie(cookie) {
   String str = cookie;
   //to use in all future API requests
   globals.cleanedCookie = upToSemiColon.stringMatch(str).toString();
-  //saveSessionCookie(globals.cleanedCookie);
 }
 
 class LoginPage extends StatefulWidget {
@@ -79,19 +78,19 @@ class _LoginPageState extends State<LoginPage> {
 
   void initState() {
     super.initState();
-    //loadSessionCookie();
+    loadSessionCookie();
   }
 
   //load saved cookie from memory, if returns 200 on a REST call, move to apphome (checking for valid session cookie)
   loadSessionCookie() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      sessionCookie = (prefs.getString('sessionCookie') ?? 0);
-    });
+    sessionCookie = (prefs.getString('sessionCookie') ?? 0);
+    print("loaded sessionCookie: $sessionCookie");
     await http.get('https://www.gig-o-matic.com/api/agenda',
         headers: {"cookie": "$sessionCookie"}).then((response) {
       if (response.statusCode == 200) {
-        globals.cleanedCookie = sessionCookie;
+        cleanCookie(response.headers["set-cookie"]);
+        saveSessionCookie(globals.cleanedCookie);
         goToHomePage();
       }
     });
@@ -134,6 +133,7 @@ class _LoginPageState extends State<LoginPage> {
         authenticateReturnCode = response.statusCode;
         if (authenticateReturnCode == 200) {
           cleanCookie(response.headers["set-cookie"]);
+          saveSessionCookie(globals.cleanedCookie);
           goToHomePage();
         } else {
           print('Login failed. Please check username and password');
