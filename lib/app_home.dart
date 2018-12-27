@@ -5,6 +5,8 @@ import 'globals.dart' as globals;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:async';
 
 String cleanedDate;
 var statusIcon;
@@ -172,22 +174,6 @@ planValueLabelGenerator(value) {
   }
 }
 
-postLogout() async {
-  //print(globals.cleanedCookie);
-  try {
-    await http.post('https://www.gig-o-matic.com/api/logout',
-        headers: {"cookie": "${globals.cleanedCookie}"}).then((response) {
-      if (response.statusCode == 200) {
-        //posting to the logout returns a cookie in an odd format, but we don't care about properly cleaning it,
-        //because the returned cookie is supposed to be invalid for next use anyways
-        cleanCookie(response.headers["set-cookie"]);
-      } else {
-        print('API call failed, response: ${response.statusCode}');
-      }
-    });
-  } catch (e) {}
-}
-
 class Gig {
   String title;
   String date;
@@ -199,6 +185,7 @@ class Gig {
   String gigID;
   String bandID;
   String bandShortName;
+  String bandLongName;
 
   Gig({
     this.title,
@@ -211,6 +198,7 @@ class Gig {
     this.gigID,
     this.bandID,
     this.bandShortName,
+    this.bandLongName,
   });
 }
 
@@ -234,6 +222,7 @@ List<Gig> createGigList(List data, List data2) {
     String gigID = data[i]["gig"]["id"];
     String bandID = data[i]["gig"]["band"].toString();
     String bandShortName = data[i]["band"]["shortname"];
+    String bandLongName = data[i]["band"]["name"];
 
     Gig gig = new Gig(
       title: title,
@@ -246,6 +235,7 @@ List<Gig> createGigList(List data, List data2) {
       gigID: gigID,
       bandID: bandID,
       bandShortName: bandShortName,
+      bandLongName: bandLongName,
     );
     list.add(gig);
   }
@@ -268,6 +258,7 @@ List<Gig> createGigList(List data, List data2) {
     String gigID = data2[i]["gig"]["id"];
     String bandID = data2[i]["gig"]["band"].toString();
     String bandShortName = data2[i]["band"]["shortname"];
+    String bandLongName = data2[i]["band"]["name"];
 
     Gig gig = new Gig(
       title: title,
@@ -280,33 +271,12 @@ List<Gig> createGigList(List data, List data2) {
       gigID: gigID,
       bandID: bandID,
       bandShortName: bandShortName,
+      bandLongName: bandLongName,
     );
     list.add(gig);
   }
 
   return list;
-}
-
-Future<List<Gig>> fetchGigInfo() async {
-  try {
-    final response = await http.get('https://www.gig-o-matic.com/api/agenda',
-        headers: {"cookie": "${globals.cleanedCookie}"});
-    if (response.statusCode == 200) {
-      cleanCookie(response.headers["set-cookie"]);
-    } else {
-      print('API call failed, response: ${response.statusCode}');
-    }
-    Map decoded = json.decode(response.body.toString());
-    List responseJSON = decoded["weighin_plans"];
-    List responseJSON2 = decoded["upcoming_plans"];
-    //debugPrint(responseJSON2.toString());
-
-    List<Gig> gigList = createGigList(responseJSON, responseJSON2);
-
-    return gigList;
-  } catch (e) {
-    print("fetch Gig Info error: $e");
-  }
 }
 
 class MyHomePage extends StatefulWidget {
@@ -316,14 +286,75 @@ class MyHomePage extends StatefulWidget {
 
 class MyHomePageState extends State<MyHomePage> {
   @override
-  void initState() {}
+  void initState() {
+    //calls the gig info once and saves it
+    fetchedInfo = fetchGigInfo();
+    super.initState();
+  }
+
+  //save session cookie to memory
+  saveSessionCookie(sessionCookie) async {
+    print("apphome saving session cookie: $sessionCookie");
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      prefs.setString('sessionCookie', sessionCookie);
+    });
+  }
+
+  //var to store gig info from agenda call
+  Future fetchedInfo;
+
+  Future<List<Gig>> fetchGigInfo() async {
+    try {
+      final response = await http.get('https://www.gig-o-matic.com/api/agenda',
+          headers: {"cookie": "${globals.cleanedCookie}"});
+      if (response.statusCode == 200) {
+        cleanCookie(response.headers["set-cookie"]);
+        saveSessionCookie(globals.cleanedCookie);
+      } else {
+        print('API call failed, response: ${response.statusCode}');
+      }
+      Map decoded = json.decode(response.body.toString());
+      List responseJSON = decoded["weighin_plans"];
+      List responseJSON2 = decoded["upcoming_plans"];
+
+      List<Gig> gigList = createGigList(responseJSON, responseJSON2);
+
+      return gigList;
+    } catch (e) {
+      print("fetch Gig Info error: $e");
+    }
+  }
+
+  postLogout() async {
+    try {
+      await http.post('https://www.gig-o-matic.com/api/logout',
+          headers: {"cookie": "${globals.cleanedCookie}"}).then((response) {
+        if (response.statusCode == 200) {
+          //posting to the logout returns a cookie in an odd format, but we don't care about properly cleaning it,
+          //because the returned cookie is supposed to be invalid for next use anyways
+          cleanCookie(response.headers["set-cookie"]);
+          print("logout response cookie: ${globals.cleanedCookie}");
+          saveSessionCookie(globals.cleanedCookie);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => LoginPage()),
+          );
+        } else {
+          print('API call failed, response: ${response.statusCode}');
+        }
+      });
+    } catch (e) {}
+  }
 
   //builds dynamic list from API
   gigBuilder() {
     return Flexible(
       fit: FlexFit.loose,
       child: new FutureBuilder<List<Gig>>(
-          future: fetchGigInfo(),
+          //fetchedInfo is used for future property, which means "cached" agenda data is reused each time the
+          //widget rebuilds, rather than the API being called
+          future: fetchedInfo,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return new ListView.builder(
@@ -362,6 +393,8 @@ class MyHomePageState extends State<MyHomePage> {
                                               fontWeight: FontWeight.bold)),
                                       onPressed: () {
                                         //To Gig Details->global variables passed from here to specific gig details
+                                        globals.currentBandName =
+                                            snapshot.data[index].bandLongName;
                                         globals.currentBandID =
                                             snapshot.data[index].bandID;
                                         globals.currentPlanComment =
@@ -423,7 +456,6 @@ class MyHomePageState extends State<MyHomePage> {
                                 ]),
                           ),
                         ]));
-                    //return new Column(children: <Widget>[
                   });
             } else if (snapshot.hasError) {
               return new Text("${snapshot.error}");
@@ -490,10 +522,6 @@ class MyHomePageState extends State<MyHomePage> {
                         fontSize: 18.0)),
                 onTap: () {
                   postLogout();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginPage()),
-                  );
                 },
               ),
               Container(

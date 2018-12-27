@@ -6,18 +6,7 @@ import 'app_home.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:async/async.dart';
 import 'login_page.dart';
-
-class BandInfo {
-  String bandName;
-
-  BandInfo({this.bandName});
-
-  factory BandInfo.fromJson(Map<String, dynamic> json) {
-    globals.currentBandName = json["name"];
-
-    return BandInfo(bandName: json["name"]);
-  }
-}
+import 'package:shared_preferences/shared_preferences.dart';
 
 TextEditingController commentController;
 
@@ -132,112 +121,7 @@ statusText(status) {
   }
 }
 
-Future<GigInfo> fetchGigInfo() async {
-  try {
-    final response = await http.get(
-        'https://www.gig-o-matic.com/api/gig/${globals.currentGigID}',
-        headers: {"cookie": "${globals.cleanedCookie}"});
-    if (response.statusCode == 200) {
-      cleanCookie(response.headers["set-cookie"]);
-    } else {
-      print('API call failed, response: ${response.statusCode}');
-    }
-    return GigInfo.fromJson(json.decode(response.body));
-  } catch (e) {
-    print(e);
-  }
-}
-
 List memberList = [];
-
-Future<List> fetchGigMemberInfo() async {
-  try {
-    final response = await http.get(
-        'https://www.gig-o-matic.com/api/gig/plans/${globals.currentGigID}',
-        headers: {"cookie": "${globals.cleanedCookie}"});
-    if (response.statusCode == 200) {
-      cleanCookie(response.headers["set-cookie"]);
-    } else {
-      print('API call failed, response: ${response.statusCode}');
-    }
-    var decoded = json.decode(response.body.toString());
-    List responseJSON = decoded;
-    List newList = [];
-
-    for (int i = 0; i < responseJSON.length; i++) {
-      Map newMap = {};
-      String name = responseJSON[i]["the_member_name"];
-      newMap["name"] = name;
-      //commented out code for adding sections info later...
-      //String section = responseJSON[i]["the_plan"]["section"];
-      //newList.add({"section": section});
-      String value = responseJSON[i]["the_plan"]["value"].toString();
-      newMap["value"] = value;
-
-      String comment = responseJSON[i]["the_plan"]["comment"];
-      if (comment != null) {
-        newMap["comment"] = comment;
-      }
-
-      newList.add(newMap);
-    }
-
-    return newList;
-  } catch (e) {
-    print(e);
-  }
-}
-
-//user can update their status for a gig
-Future putStatus(newValue) async {
-  try {
-    await http.put(
-        'https://www.gig-o-matic.com/api/plan/${globals.currentPlanID}/value/$newValue',
-        headers: {"cookie": "${globals.cleanedCookie}"}).then((response) {
-      if (response.statusCode == 200) {
-        cleanCookie(response.headers["set-cookie"]);
-      } else {
-        print('API call failed, response: ${response.statusCode}');
-      }
-    });
-  } catch (e) {
-    print(e);
-  }
-}
-
-//user can add or update a comment for a gig
-Future postComment(newComment) async {
-  try {
-    await http.post(
-        'https://www.gig-o-matic.com/api/plan/${globals.currentPlanID}/comment',
-        headers: {"cookie": "${globals.cleanedCookie}"},
-        body: {"comment": "$newComment"}).then((response) {
-      if (response.statusCode == 200) {
-        cleanCookie(response.headers["set-cookie"]);
-      } else {
-        print('API call failed, response: ${response.statusCode}');
-      }
-    });
-  } catch (e) {
-    print(e);
-  }
-}
-
-Future<BandInfo> fetchBandName(bandID) async {
-  try {
-    final response = await http.get(
-        'https://www.gig-o-matic.com/api/band/$bandID',
-        headers: {"cookie": "${globals.cleanedCookie}"});
-    if (response.statusCode == 200) {
-      cleanCookie(response.headers["set-cookie"]);
-    } else {
-      print('API call failed, response: ${response.statusCode}');
-    }
-    return BandInfo.fromJson(json.decode(response.body));
-  } catch (e) {
-    print("Fetching Band Name from Band ID: $e");
-  }
-}
 
 class GigDetails extends StatefulWidget {
   @override
@@ -261,6 +145,114 @@ class GigDetailsState extends State<GigDetails> {
         memberList = result;
       });
     });
+
+    fetchedGigDetails = fetchGigDetailsInfo();
+    super.initState();
+  }
+
+  //user can add or update a comment for a gig
+  Future postComment(newComment) async {
+    try {
+      await http.post(
+          'https://www.gig-o-matic.com/api/plan/${globals.currentPlanID}/comment',
+          headers: {"cookie": "${globals.cleanedCookie}"},
+          body: {"comment": "$newComment"}).then((response) {
+        if (response.statusCode == 200) {
+          cleanCookie(response.headers["set-cookie"]);
+          saveSessionCookie(globals.cleanedCookie);
+        } else {
+          print('API call failed, response: ${response.statusCode}');
+        }
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  //user can update their status for a gig
+  Future putStatus(newValue) async {
+    try {
+      await http.put(
+          'https://www.gig-o-matic.com/api/plan/${globals.currentPlanID}/value/$newValue',
+          headers: {"cookie": "${globals.cleanedCookie}"}).then((response) {
+        if (response.statusCode == 200) {
+          cleanCookie(response.headers["set-cookie"]);
+          saveSessionCookie(globals.cleanedCookie);
+        } else {
+          print('API call failed, response: ${response.statusCode}');
+        }
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  //save session cookie to memory
+  saveSessionCookie(sessionCookie) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      prefs.setString('sessionCookie', sessionCookie);
+    });
+  }
+
+  Future<List> fetchGigMemberInfo() async {
+    try {
+      final response = await http.get(
+          'https://www.gig-o-matic.com/api/gig/plans/${globals.currentGigID}',
+          headers: {"cookie": "${globals.cleanedCookie}"});
+      if (response.statusCode == 200) {
+        cleanCookie(response.headers["set-cookie"]);
+        saveSessionCookie(globals.cleanedCookie);
+      } else {
+        print('API call failed, response: ${response.statusCode}');
+      }
+      var decoded = json.decode(response.body.toString());
+      List responseJSON = decoded;
+      List newList = [];
+
+      for (int i = 0; i < responseJSON.length; i++) {
+        Map newMap = {};
+        String name = responseJSON[i]["the_member_name"];
+        newMap["name"] = name;
+        //commented out code for adding sections info later...
+        //String section = responseJSON[i]["the_plan"]["section"];
+        //newList.add({"section": section});
+        String value = responseJSON[i]["the_plan"]["value"].toString();
+        newMap["value"] = value;
+
+        String comment = responseJSON[i]["the_plan"]["comment"];
+        if (comment != null) {
+          newMap["comment"] = comment;
+        }
+
+        newList.add(newMap);
+      }
+
+      return newList;
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future fetchedGigDetails;
+
+  Future<GigInfo> fetchGigDetailsInfo() async {
+    print(globals.cleanedCookie);
+    print("fetching gig details");
+    try {
+      final response = await http.get(
+          'https://www.gig-o-matic.com/api/gig/${globals.currentGigID}',
+          headers: {"cookie": "${globals.cleanedCookie}"});
+      if (response.statusCode == 200) {
+        cleanCookie(response.headers["set-cookie"]);
+        saveSessionCookie(globals.cleanedCookie);
+      } else {
+        print('API call failed, response: ${response.statusCode}');
+      }
+      return GigInfo.fromJson(json.decode(response.body));
+    } catch (e) {
+      print(e);
+    }
   }
 
   //for updating user status
@@ -317,37 +309,38 @@ class GigDetailsState extends State<GigDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        //need initstate to run on return to homepage, to reload current gig information,
+        //especially if user has updated status or comment. Disabled default back button and created one
+        //that will do so
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.blue,
         title: Row(children: [
-          FutureBuilder<BandInfo>(
-            future: fetchBandName(globals.currentBandID),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Expanded(
-                  child: Container(
-                    child: Text(snapshot.data.bandName),
-                  ),
+          Container(
+            child: FlatButton(
+              child: Icon(Icons.arrow_back),
+              onPressed: () {
+                return Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyHomePage()),
                 );
-              } else if (snapshot.hasError) {
-                return Text("${snapshot.error}");
-              }
-
-              return Center(
-                child: new CircularProgressIndicator(
-                  strokeWidth: 3.0,
-                  value: null,
-                  valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              );
-            },
-          )
+              },
+            ),
+          ),
+          Expanded(
+            child: Container(
+              child: Text(
+                globals.currentBandName,
+                softWrap: true,
+              ),
+            ),
+          ),
         ]),
       ),
       body: Container(
           color: Colors.white,
           padding: EdgeInsets.all(10.0),
           child: FutureBuilder<GigInfo>(
-            future: fetchGigInfo(),
+            future: fetchedGigDetails,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return new ListView(
