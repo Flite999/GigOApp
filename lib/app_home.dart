@@ -527,7 +527,7 @@ class MyHomePageState extends State<MyHomePage> {
               Container(
                 padding: EdgeInsets.only(left: 15.0),
                 alignment: Alignment.bottomLeft,
-                child: Text("App Version: 0.1"),
+                child: Text("App Version: 0.5"),
               ),
             ],
           ),
