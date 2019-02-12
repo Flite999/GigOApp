@@ -294,7 +294,6 @@ class MyHomePageState extends State<MyHomePage> {
 
   //save session cookie to memory
   saveSessionCookie(sessionCookie) async {
-    print("apphome saving session cookie: $sessionCookie");
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       prefs.setString('sessionCookie', sessionCookie);
@@ -334,7 +333,6 @@ class MyHomePageState extends State<MyHomePage> {
           //posting to the logout returns a cookie in an odd format, but we don't care about properly cleaning it,
           //because the returned cookie is supposed to be invalid for next use anyways
           cleanCookie(response.headers["set-cookie"]);
-          print("logout response cookie: ${globals.cleanedCookie}");
           saveSessionCookie(globals.cleanedCookie);
           Navigator.push(
             context,
