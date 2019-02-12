@@ -85,7 +85,7 @@ class _LoginPageState extends State<LoginPage> {
   loadSessionCookie() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     sessionCookie = (prefs.getString('sessionCookie') ?? 0);
-    print("loaded sessionCookie: $sessionCookie");
+    //print("loaded sessionCookie: $sessionCookie");
     await http.get('https://www.gig-o-matic.com/api/agenda',
         headers: {"cookie": "$sessionCookie"}).then((response) {
       if (response.statusCode == 200) {

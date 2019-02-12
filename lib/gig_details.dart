@@ -7,8 +7,20 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:async/async.dart';
 import 'login_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 TextEditingController commentController;
+
+googleMapsAdd(str) {
+  //if str contains http do nothing and return str
+  RegExp exp = new RegExp(r'http');
+  var match = exp.hasMatch(str);
+  if (match == true) {
+    return str;
+  }
+  String formattedStr = Uri.encodeFull(str);
+  return "http://maps.google.com/?q=" + formattedStr;
+}
 
 class GigInfo {
   String gigStatus;
@@ -19,6 +31,7 @@ class GigInfo {
   String gigSetTime;
   String gigEndTime;
   String gigAddress;
+  String gigAddressLink;
   String gigPaid;
   String gigLeader;
   String gigPostGig;
@@ -32,6 +45,7 @@ class GigInfo {
       this.gigStatus,
       this.gigDate,
       this.gigAddress,
+      this.gigAddressLink,
       this.gigCallTime,
       this.gigDetails,
       this.gigEndTime,
@@ -52,6 +66,7 @@ class GigInfo {
         gigSetTime: json["settime"],
         gigEndTime: json["endtime"],
         gigAddress: json["address"],
+        gigAddressLink: googleMapsAdd(json["address"]),
         gigPaid: json["paid"],
         gigLeader: json["leader"],
         gigPostGig: json["postgig"],
@@ -237,8 +252,6 @@ class GigDetailsState extends State<GigDetails> {
   Future fetchedGigDetails;
 
   Future<GigInfo> fetchGigDetailsInfo() async {
-    print(globals.cleanedCookie);
-    print("fetching gig details");
     try {
       final response = await http.get(
           'https://www.gig-o-matic.com/api/gig/${globals.currentGigID}',
@@ -366,7 +379,39 @@ class GigDetailsState extends State<GigDetails> {
                         gigText(snapshot.data.gigCallTime, "Call Time"),
                         gigText(snapshot.data.gigSetTime, "Set Time"),
                         gigText(snapshot.data.gigEndTime, "End Time"),
-                        gigText(snapshot.data.gigAddress, "Gig Address"),
+                        new Container(
+                          margin: EdgeInsets.all(5.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              new Container(
+                                child: new Text(
+                                  "Gig Address: ",
+                                  softWrap: true,
+                                  style: TextStyle(fontSize: 20.0),
+                                ),
+                              ),
+                              new Expanded(
+                                  child: new Container(
+                                child: FlatButton(
+                                  child: Text("${snapshot.data.gigAddress}",
+                                      style: TextStyle(
+                                          color:
+                                              Color.fromRGBO(14, 39, 96, 1.0),
+                                          fontSize: 17.0,
+                                          fontWeight: FontWeight.bold)),
+                                  onPressed: () async {
+                                    if (await canLaunch(
+                                        "${snapshot.data.gigAddressLink}")) {
+                                      await launch(
+                                          "${snapshot.data.gigAddressLink}");
+                                    }
+                                  },
+                                ),
+                              ))
+                            ],
+                          ),
+                        ),
                         gigText(snapshot.data.gigPaid, "Pay"),
                         gigText(snapshot.data.gigLeader, "Leader"),
                         gigText(snapshot.data.gigPostGig, "Post-Gig Plans"),
