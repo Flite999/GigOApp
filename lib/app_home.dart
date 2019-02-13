@@ -8,7 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 
-String cleanedDate;
+//String cleanedDate;
 var statusIcon;
 String bandID;
 String bandName;
@@ -21,8 +21,8 @@ gigTitles(String title) {
 cleanDate(date) {
   RegExp upToSpace = new RegExp(r".*(?=[ ])");
   String str = date;
-  cleanedDate = upToSpace.stringMatch(str).toString();
-  globals.currentGigDate = cleanedDate;
+  String cleanedDate = upToSpace.stringMatch(str).toString();
+  return cleanedDate;
 }
 
 Widget cancelledStatusIconFormatted =
@@ -208,8 +208,7 @@ List<Gig> createGigList(List data, List data2) {
   //Weigh In Plans
   for (int i = 0; i < data.length; i++) {
     String title = data[i]["gig"]["title"];
-    String rawDate = data[i]["gig"]["date"];
-    cleanDate(rawDate);
+    String date = cleanDate(data[i]["gig"]["date"]);
     String status = data[i]["gig"]["status"].toString();
     String planValue = data[i]["plan"]["value"].toString();
     String planValueLabel =
@@ -226,7 +225,7 @@ List<Gig> createGigList(List data, List data2) {
 
     Gig gig = new Gig(
       title: title,
-      date: cleanedDate,
+      date: date,
       status: status,
       planValue: planValue,
       planValueLabel: planValueLabel,
@@ -244,8 +243,7 @@ List<Gig> createGigList(List data, List data2) {
 
   for (int i = 0; i < data2.length; i++) {
     String title = data2[i]["gig"]["title"];
-    String rawDate = data2[i]["gig"]["date"];
-    cleanDate(rawDate);
+    String date = cleanDate(data2[i]["gig"]["date"]);
     String status = data2[i]["gig"]["status"].toString();
     String planValue = data2[i]["plan"]["value"].toString();
     String planValueLabel =
@@ -262,7 +260,7 @@ List<Gig> createGigList(List data, List data2) {
 
     Gig gig = new Gig(
       title: title,
-      date: cleanedDate,
+      date: date,
       status: status,
       planValue: planValue,
       planValueLabel: planValueLabel,
