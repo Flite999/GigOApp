@@ -26,6 +26,7 @@ class GigInfo {
   String gigStatus;
   String gigBand;
   String gigContact;
+  String rawDate;
   String gigDate;
   String gigCallTime;
   String gigSetTime;
@@ -61,7 +62,7 @@ class GigInfo {
         gigStatus: json["status"].toString(),
         gigBand: json["band"],
         gigContact: json["contact"],
-        gigDate: json["date"],
+        gigDate: cleanDate(json["date"]),
         gigCallTime: json["calltime"],
         gigSetTime: json["settime"],
         gigEndTime: json["endtime"],
@@ -375,7 +376,8 @@ class GigDetailsState extends State<GigDetails> {
                           ),
                         ),
                         Divider(),
-                        gigText(globals.currentGigDate, "Gig Date"),
+                        //gigText(globals.currentGigDate, "Gig Date"),
+                        gigText(snapshot.data.gigDate, "Gig Date"),
                         gigText(snapshot.data.gigCallTime, "Call Time"),
                         gigText(snapshot.data.gigSetTime, "Set Time"),
                         gigText(snapshot.data.gigEndTime, "End Time"),
