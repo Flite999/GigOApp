@@ -144,13 +144,17 @@ class GigDetails extends StatefulWidget {
   State<StatefulWidget> createState() => new GigDetailsState();
 }
 
-class GigDetailsState extends State<GigDetails> {
+class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
   @override
   void dispose() {
     // Clean up the controller when the Widget is disposed
     commentController.dispose();
     super.dispose();
   }
+
+  //declare var for check icon animation
+  AnimationController animationController;
+  Animation<double> _fabScale;
 
   void initState() {
     commentController =
@@ -163,8 +167,38 @@ class GigDetailsState extends State<GigDetails> {
     });
 
     fetchedGigDetails = fetchGigDetailsInfo();
+    //hiding or showing comment text field depending on user comment entered for gig or not
+    if (globals.currentPlanComment != "") {
+      visibilityComment = true;
+      commentButtonText = "Edit Comment";
+    }
+    if (globals.currentPlanComment == "") {
+      visibilityComment = false;
+      commentButtonText = "Submit Comment";
+    }
+    //animation setup for check icon to confirm user comment input sent
+    animationController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 500));
+
+    animationController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        animationController.reverse();
+      }
+    });
+
+    _fabScale = Tween<double>(begin: 0, end: 1).animate(
+        CurvedAnimation(parent: animationController, curve: Curves.bounceOut));
+
+    _fabScale.addListener(() {
+      setState(() {});
+    });
     super.initState();
   }
+
+  //for comment text field
+  FocusNode nodeOne = FocusNode();
+  bool visibilityComment = false;
+  String commentButtonText = "Error";
 
   //user can add or update a comment for a gig
   Future postComment(newComment) async {
@@ -436,18 +470,63 @@ class GigDetailsState extends State<GigDetails> {
                             ],
                           ),
                         ),
+                        //if there is a comment, reveal the comment in textfield, if not, hide text field
+                        visibilityComment
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: <Widget>[
+                                  Flexible(
+                                    child: Container(
+                                      padding: EdgeInsets.only(left: 15.0),
+                                      child: new TextField(
+                                        focusNode: nodeOne,
+                                        controller: commentController,
+                                        onSubmitted: (val) {
+                                          postComment(val);
+                                          //fire the check icon
+                                          animationController.forward();
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  //check icon to confirm the user input completed
+                                  Transform.scale(
+                                    scale: _fabScale.value,
+                                    child: Card(
+                                      shape: CircleBorder(),
+                                      color: Colors.green,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Icon(
+                                          Icons.check,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              )
+                            : new Container(),
                         Container(
-                          padding: EdgeInsets.all(10.0),
-                          child: new TextField(
-                              controller: commentController,
-                              onSubmitted: (val) {
-                                postComment(val);
-                              },
-                              decoration: InputDecoration(
-                                  helperText: "Comment Here",
-                                  border: OutlineInputBorder(),
-                                  filled: true,
-                                  fillColor: Colors.white)),
+                          alignment: Alignment.centerLeft,
+                          child: FlatButton(
+                            onPressed: () {
+                              //if a comment exists, clicking the button will focus on the textfield
+                              visibilityComment
+                                  ? FocusScope.of(context).requestFocus(nodeOne)
+                                  //if a comment doesn't exist, clicking the button will reveal text field and change
+                                  //the button text to editing
+                                  : setState(() {
+                                      visibilityComment = true;
+                                      commentButtonText = "Edit Comment";
+                                    });
+                            },
+                            child: Text(commentButtonText,
+                                style: TextStyle(
+                                    color: Color.fromRGBO(14, 39, 96, 1.0),
+                                    fontSize: 17.0,
+                                    fontWeight: FontWeight.bold)),
+                          ),
                         ),
                         Divider(),
                         gigTextHeader("Plans"),
