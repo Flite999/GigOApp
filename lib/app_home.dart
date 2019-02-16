@@ -215,9 +215,6 @@ List<Gig> createGigList(List data, List data2) {
         planValueLabelGenerator(data[i]["plan"]["value"].toString());
     String planComment = data[i]["plan"]["comment"];
     String planID = data[i]["plan"]["id"];
-    if (planComment == "") {
-      planComment = "...";
-    }
     String gigID = data[i]["gig"]["id"];
     String bandID = data[i]["gig"]["band"].toString();
     String bandShortName = data[i]["band"]["shortname"];
@@ -250,9 +247,6 @@ List<Gig> createGigList(List data, List data2) {
         planValueLabelGenerator(data2[i]["plan"]["value"].toString());
     String planComment = data2[i]["plan"]["comment"];
     String planID = data2[i]["plan"]["id"];
-    if (planComment == "") {
-      planComment = "...";
-    }
     String gigID = data2[i]["gig"]["id"];
     String bandID = data2[i]["gig"]["band"].toString();
     String bandShortName = data2[i]["band"]["shortname"];
