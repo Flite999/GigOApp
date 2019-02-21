@@ -200,6 +200,9 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
   bool visibilityComment = false;
   String commentButtonText = "Error";
 
+  //for setlist
+  bool setListIsExpanded = false;
+
   //user can add or update a comment for a gig
   Future postComment(newComment) async {
     try {
@@ -297,6 +300,7 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
       } else {
         print('API call failed, response: ${response.statusCode}');
       }
+
       return GigInfo.fromJson(json.decode(response.body));
     } catch (e) {
       print(e);
@@ -455,8 +459,53 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                         gigTextHeader("Details"),
                         gigText(snapshot.data.gigDetails),
                         Divider(),
-                        gigTextHeader("SetList"),
-                        gigText(snapshot.data.gigSetList),
+                        setListIsExpanded
+                            ? Column(
+                                children: <Widget>[
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: <Widget>[
+                                      Flexible(
+                                        child: gigTextHeader("SetList"),
+                                      ),
+                                      new RawMaterialButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              setListIsExpanded = false;
+                                            });
+                                          },
+                                          child: new Icon(
+                                            Icons.arrow_drop_down,
+                                            color: Colors.black,
+                                            size: 35.0,
+                                          )),
+                                    ],
+                                  ),
+                                  gigText(snapshot.data.gigSetList),
+                                ],
+                              )
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Flexible(
+                                    child: gigTextHeader("SetList"),
+                                  ),
+                                  Container(
+                                    child: new RawMaterialButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            setListIsExpanded = true;
+                                          });
+                                        },
+                                        child: new Icon(
+                                          Icons.arrow_drop_up,
+                                          color: Colors.black,
+                                          size: 35.0,
+                                        )),
+                                  ),
+                                ],
+                              ),
+
                         Divider(),
                         gigTextHeader("Your Status: "),
                         Container(
