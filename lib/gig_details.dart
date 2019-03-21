@@ -248,6 +248,19 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
     });
   }
 
+  //function takes section ID and returns a name for that section
+  returnSectionName(id) {
+    //for each section instance in list, if id key equals id, return the name
+    for (int i = 0; i < sectionList.length; i++) {
+      if (id == "") {
+        return "";
+      }
+      if (id == sectionList[i].id) {
+        return sectionList[i].name;
+      }
+    }
+  }
+
   Future<List> fetchGigMemberInfo() async {
     try {
       final response = await http.get(
@@ -265,21 +278,50 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
 
       for (int i = 0; i < responseJSON.length; i++) {
         Map newMap = {};
-        String name = responseJSON[i]["the_member_name"];
+        String name = responseJSON[i]["the_member_name"].toString();
         newMap["name"] = name;
-        //commented out code for adding sections info later...
-        //String section = responseJSON[i]["the_plan"]["section"];
-        //newList.add({"section": section});
+        newMap["section"] = returnSectionName(
+            responseJSON[i]["the_plan"]["section"].toString());
+
         String value = responseJSON[i]["the_plan"]["value"].toString();
         newMap["value"] = value;
 
         String comment = responseJSON[i]["the_plan"]["comment"];
+
         if (comment != null) {
           newMap["comment"] = comment;
+        } else {
+          newMap["comment"] = "";
         }
 
         newList.add(newMap);
       }
+
+      newList.sort((a, b) {
+        return a["section"].compareTo(b["section"]);
+      });
+      //Ideally this is where the logic would go to add section headers for each section. However
+      //the newList variable gets polluted somehow after it goes through the loop and can't be manipulated
+      //after the fact. Will address later.
+      //after list is sorted due to section name, the section name would be added to the newList.
+      /*
+      List alterationsList = [];
+
+      for (int i = 1; i < newList.length; i++) {
+        
+        if (newList[i]["section"] != newList[i - 1]["section"]) {
+        Map alterationsMap = <String, dynamic>{};
+        String toAdd = newList[i]["section"];
+        int index = i;
+
+        alterationsMap["index"] = index.toInt();
+
+        alterationsMap["value"] = toAdd;
+        alterationsList.add([index, toAdd]);
+        }
+        
+      }
+      */
 
       return newList;
     } catch (e) {
@@ -587,7 +629,16 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                           itemCount: memberList.length,
                           itemBuilder: (context, index) {
                             return Container(
-                                padding: EdgeInsets.only(left: 5.0),
+                                margin: EdgeInsets.only(bottom: 5.0),
+                                decoration: new BoxDecoration(
+                                  border: new Border(
+                                    left: new BorderSide(
+                                        color: Colors.grey,
+                                        width: 5.0,
+                                        style: BorderStyle.solid),
+                                  ),
+                                ),
+                                padding: EdgeInsets.only(left: 10.0),
                                 child: Column(children: <Widget>[
                                   Container(
                                     child: Row(
@@ -597,6 +648,13 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                                           child: Text(
                                             '${memberList[index]["name"]}',
                                             style: TextStyle(fontSize: 20.0),
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: EdgeInsets.only(right: 15.0),
+                                          child: Text(
+                                            '${memberList[index]["section"]}',
+                                            style: TextStyle(fontSize: 15.0),
                                           ),
                                         ),
                                         Container(
