@@ -202,6 +202,9 @@ class Gig {
   });
 }
 
+List bandIDs = [];
+List cleanedBandIDs;
+
 List<Gig> createGigList(List data, List data2) {
   List<Gig> list = new List();
 
@@ -217,6 +220,7 @@ List<Gig> createGigList(List data, List data2) {
     String planID = data[i]["plan"]["id"];
     String gigID = data[i]["gig"]["id"];
     String bandID = data[i]["gig"]["band"].toString();
+    bandIDs.add(bandID);
     String bandShortName = data[i]["band"]["shortname"];
     String bandLongName = data[i]["band"]["name"];
 
@@ -249,6 +253,7 @@ List<Gig> createGigList(List data, List data2) {
     String planID = data2[i]["plan"]["id"];
     String gigID = data2[i]["gig"]["id"];
     String bandID = data2[i]["gig"]["band"].toString();
+    bandIDs.add(bandID);
     String bandShortName = data2[i]["band"]["shortname"];
     String bandLongName = data2[i]["band"]["name"];
 
@@ -271,6 +276,18 @@ List<Gig> createGigList(List data, List data2) {
   return list;
 }
 
+class Section {
+  String name;
+  String id;
+
+  Section({
+    this.name,
+    this.id,
+  });
+}
+
+List sectionList;
+
 class MyHomePage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => new MyHomePageState();
@@ -283,6 +300,8 @@ class MyHomePageState extends State<MyHomePage> {
     fetchedInfo = fetchGigInfo();
     super.initState();
   }
+
+  MediaQueryData queryData;
 
   //save session cookie to memory
   saveSessionCookie(sessionCookie) async {
@@ -305,16 +324,52 @@ class MyHomePageState extends State<MyHomePage> {
       } else {
         print('API call failed, response: ${response.statusCode}');
       }
+
       Map decoded = json.decode(response.body.toString());
       List responseJSON = decoded["weighin_plans"];
       List responseJSON2 = decoded["upcoming_plans"];
 
       List<Gig> gigList = createGigList(responseJSON, responseJSON2);
 
+      cleanedBandIDs = bandIDs.toSet().toList();
+      sectionList = await fetchBandSections();
+
       return gigList;
     } catch (e) {
       print("fetch Gig Info error: $e");
     }
+  }
+
+  Future<List> fetchBandSections() async {
+    List<Section> list = new List();
+    for (int i = 0; i < cleanedBandIDs.length; i++) {
+      try {
+        final response = await http.get(
+            'https://www.gig-o-matic.com/api/band/${cleanedBandIDs[i]}',
+            headers: {"cookie": "${globals.cleanedCookie}"});
+        if (response.statusCode == 200) {
+          cleanCookie(response.headers["set-cookie"]);
+          saveSessionCookie(globals.cleanedCookie);
+        } else {
+          print('API call failed, response: ${response.statusCode}');
+        }
+        Map decoded = json.decode(response.body.toString());
+
+        for (int i = 0; i < decoded["sections"].length; i++) {
+          String name = decoded["sections"][i]["name"];
+          String id = decoded["sections"][i]['id'];
+
+          Section section = new Section(
+            name: name,
+            id: id,
+          );
+          list.add(section);
+        }
+      } catch (e) {
+        print("fetch Band Section error: $e");
+      }
+    }
+    return list;
   }
 
   postLogout() async {
@@ -517,7 +572,7 @@ class MyHomePageState extends State<MyHomePage> {
               Container(
                 padding: EdgeInsets.only(left: 15.0),
                 alignment: Alignment.bottomLeft,
-                child: Text("App Version: 0.5"),
+                child: Text("App Version: 1.0"),
               ),
             ],
           ),

@@ -29,6 +29,7 @@ class _LoginPageState extends State<LoginPage> {
   String password;
   //var to store cookie for session persistence
   String sessionCookie;
+  MediaQueryData queryData;
 
   launchSignUp() async {
     const url = "https://www.gig-o-matic.com/signup?locale=en";

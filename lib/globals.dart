@@ -10,3 +10,4 @@ var currentPlanIcon;
 String currentPlanDescription;
 String currentPlanID;
 String currentPlanComment;
+Map bandSections;
