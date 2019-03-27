@@ -252,8 +252,11 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
   returnSectionName(id) {
     //for each section instance in list, if id key equals id, return the name
     for (int i = 0; i < sectionList.length; i++) {
+      if (id == null) {
+        return "No Section";
+      }
       if (id == "") {
-        return "";
+        return "No Section";
       }
       if (id == sectionList[i].id) {
         return sectionList[i].name;
@@ -282,7 +285,9 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
         newMap["name"] = name;
         newMap["section"] = returnSectionName(
             responseJSON[i]["the_plan"]["section"].toString());
-
+        if (newMap["section"] == null) {
+          newMap["section"] = "";
+        }
         String value = responseJSON[i]["the_plan"]["value"].toString();
         newMap["value"] = value;
 
@@ -296,10 +301,12 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
 
         newList.add(newMap);
       }
+      if (newList.length > 1) {
+        newList.sort((a, b) {
+          return a["section"].compareTo(b["section"]);
+        });
+      }
 
-      newList.sort((a, b) {
-        return a["section"].compareTo(b["section"]);
-      });
       //Ideally this is where the logic would go to add section headers for each section. However
       //the newList variable gets polluted somehow after it goes through the loop and can't be manipulated
       //after the fact. Will address later.
