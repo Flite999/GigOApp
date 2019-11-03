@@ -1,62 +1,50 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'app_home.dart';
 import 'package:http/http.dart' as http;
-import 'dart:async';
-import 'globals.dart' as globals;
-import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'home.dart';
+import '../utils/globals.dart' as globals;
+import '../utils/sessionTools.dart';
 
-//only get all characters up to semicolon
-cleanCookie(cookie) {
-  RegExp upToSemiColon = new RegExp(r".*(?=\;)");
-  String str = cookie;
-  //to use in all future API requests
-  globals.cleanedCookie = upToSemiColon.stringMatch(str).toString();
+//login_page functions
+launchSignUp() async {
+  const url = "https://www.gig-o-matic.com/signup?locale=en";
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    throw 'Could not launch $url';
+  }
+}
+
+launchForgotPass() async {
+  const url = "https://www.gig-o-matic.com/forgot?locale=en";
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    throw 'Could not launch $url';
+  }
+}
+
+launchEmailWebmaster() async {
+  const url = "mailto:superuser@gig-o-matic.com?subject=App%20Question";
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    throw 'Could not launch $url';
+  }
 }
 
 class LoginPage extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => new _LoginPageState();
+  State<StatefulWidget> createState() => new LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class LoginPageState extends State<LoginPage> {
   final formKey = new GlobalKey<FormState>();
   final emailController = new TextEditingController();
   final passwordController = new TextEditingController();
-  int authenticateReturnCode;
-  String email;
-  String password;
-  //var to store cookie for session persistence
-  String sessionCookie;
-  MediaQueryData queryData;
-
-  launchSignUp() async {
-    const url = "https://www.gig-o-matic.com/signup?locale=en";
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
-
-  launchForgotPass() async {
-    const url = "https://www.gig-o-matic.com/forgot?locale=en";
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
-
-  launchEmailWebmaster() async {
-    const url = "mailto:superuser@gig-o-matic.com?subject=App%20Question";
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
 
   void _showDialog() {
     showDialog(
@@ -82,10 +70,11 @@ class _LoginPageState extends State<LoginPage> {
     loadSessionCookie();
   }
 
+  //loadSessionCookie MUST live here for proper user state initialization!
   //load saved cookie from memory, if returns 200 on a REST call, move to apphome (checking for valid session cookie)
   loadSessionCookie() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    sessionCookie = (prefs.getString('sessionCookie') ?? 0);
+    String sessionCookie = (prefs.getString('sessionCookie') ?? 0);
     await http.get('https://www.gig-o-matic.com/api/agenda',
         headers: {"cookie": "$sessionCookie"}).then((response) {
       if (response.statusCode == 200) {
@@ -93,14 +82,6 @@ class _LoginPageState extends State<LoginPage> {
         saveSessionCookie(globals.cleanedCookie);
         goToHomePage();
       }
-    });
-  }
-
-  //save session cookie to memory
-  saveSessionCookie(sessionCookie) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      prefs.setString('sessionCookie', sessionCookie);
     });
   }
 
@@ -125,12 +106,12 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Future<List> authenticate(String email, String pass) async {
+  Future authenticate(String email, String pass) async {
     var url = "https://www.gig-o-matic.com/api/authenticate";
     try {
       await http.post(url, body: {"email": "$email", "password": "$pass"}).then(
           (response) {
-        authenticateReturnCode = response.statusCode;
+        int authenticateReturnCode = response.statusCode;
         if (authenticateReturnCode == 200) {
           cleanCookie(response.headers["set-cookie"]);
           saveSessionCookie(globals.cleanedCookie);
