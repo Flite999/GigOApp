@@ -1,143 +1,23 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'globals.dart' as globals;
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'app_home.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:async/async.dart';
-import 'login_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:gig_o/utils/buildTools.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../utils/globals.dart' as globals;
+import '../utils/formatTools.dart';
+import '../utils/apiTools.dart';
+import 'home.dart';
+import '../utils/classes.dart';
 
+//to-do: see how much you can break out the animation code to utils/animationTools.dart
+
+//for user update on gig status
 TextEditingController commentController;
-
-googleMapsAdd(str) {
-  //if str contains http do nothing and return str
-  RegExp exp = new RegExp(r'http');
-  var match = exp.hasMatch(str);
-  if (match == true) {
-    return str;
-  }
-  String formattedStr = Uri.encodeFull(str);
-  return "http://maps.google.com/?q=" + formattedStr;
-}
-
-class GigInfo {
-  String gigStatus;
-  String gigBand;
-  String gigContact;
-  String rawDate;
-  String gigDate;
-  String gigCallTime;
-  String gigSetTime;
-  String gigEndTime;
-  String gigAddress;
-  String gigAddressLink;
-  String gigPaid;
-  String gigLeader;
-  String gigPostGig;
-  String gigDetails;
-  String gigTitle;
-  String gigSetList;
-
-  GigInfo(
-      {this.gigBand,
-      this.gigContact,
-      this.gigStatus,
-      this.gigDate,
-      this.gigAddress,
-      this.gigAddressLink,
-      this.gigCallTime,
-      this.gigDetails,
-      this.gigEndTime,
-      this.gigLeader,
-      this.gigPaid,
-      this.gigPostGig,
-      this.gigSetTime,
-      this.gigTitle,
-      this.gigSetList});
-
-  factory GigInfo.fromJson(Map<String, dynamic> json) {
-    return GigInfo(
-        gigStatus: json["status"].toString(),
-        gigBand: json["band"],
-        gigContact: json["contact"],
-        gigDate: cleanDate(json["date"]),
-        gigCallTime: json["calltime"],
-        gigSetTime: json["settime"],
-        gigEndTime: json["endtime"],
-        gigAddress: json["address"],
-        gigAddressLink: googleMapsAdd(json["address"]),
-        gigPaid: json["paid"],
-        gigLeader: json["leader"],
-        gigPostGig: json["postgig"],
-        gigDetails: json["details"],
-        gigTitle: json["title"],
-        gigSetList: json["setlist"]);
-  }
-}
-
-gigText(info, [label]) {
-  var result = "$info";
-
-  if (label != null) {
-    result = "$label: $info";
-  }
-
-  return new Container(
-    margin: EdgeInsets.all(5.0),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        new Expanded(
-            child: new Container(
-          child: new Text(
-            result,
-            softWrap: true,
-            style: TextStyle(fontSize: 20.0),
-          ),
-        ))
-      ],
-    ),
-  );
-}
-
-gigTextHeader(info) {
-  return new Container(
-    margin: EdgeInsets.all(5.0),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        new Expanded(
-            child: new Container(
-          child: new Text(
-            info,
-            softWrap: true,
-            style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
-          ),
-        ))
-      ],
-    ),
-  );
-}
-
-//Gig Status Explanations
-statusText(status) {
-  /*
-  0 - Pending
-  1 - Confirmed
-  2 - Cancelled
-  */
-  if (status == "2") {
-    return Text("Cancelled!", style: TextStyle(fontSize: 20.0));
-  } else if (status == "1") {
-    return Text("Confirmed!", style: TextStyle(fontSize: 20.0));
-  } else {
-    return Text("Pending", style: TextStyle(fontSize: 20.0));
-  }
-}
-
+//initialize memberList on each gig_details page load
 List memberList = [];
+
+//declare var for check icon animation
+Animation<double> _fabScale;
+AnimationController animationController;
 
 class GigDetails extends StatefulWidget {
   @override
@@ -152,22 +32,13 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  //declare var for check icon animation
-  AnimationController animationController;
-  Animation<double> _fabScale;
+  //for comment text field
+  FocusNode nodeOne = FocusNode();
+  bool visibilityComment = false;
+  String commentButtonText = "Error";
 
-  void initState() {
-    commentController =
-        new TextEditingController(text: globals.currentPlanComment);
-
-    fetchGigMemberInfo().then((result) {
-      setState(() {
-        memberList = result;
-      });
-    });
-
-    fetchedGigDetails = fetchGigDetailsInfo();
-    //hiding or showing comment text field depending on user comment entered for gig or not
+  //hiding or showing comment text field depending on user comment entered for gig or not
+  void _currentPlanComment() {
     if (globals.currentPlanComment != "") {
       visibilityComment = true;
       commentButtonText = "Edit Comment";
@@ -176,191 +47,59 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
       visibilityComment = false;
       commentButtonText = "Submit Comment";
     }
+  }
+
+  void initState() {
+    //build comment widget
+    commentController =
+        new TextEditingController(text: globals.currentPlanComment);
+
+    //gather member info for gig on init
+    /*fetchGigMemberInfo().then((result) {
+      setState(() {
+        memberList = result;
+      });
+    });*/
+
+    buildGigMemberList().then((result) {
+      setState(() {
+        memberList = result;
+      });
+    });
+
+    //cache gig details so gig details are fetched once on page init
+    fetchedGigDetails = buildGigInfo();
+    _currentPlanComment();
+
     //animation setup for check icon to confirm user comment input sent
     animationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 500));
-
     animationController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         animationController.reverse();
       }
     });
-
     _fabScale = Tween<double>(begin: 0, end: 1).animate(
         CurvedAnimation(parent: animationController, curve: Curves.bounceOut));
-
     _fabScale.addListener(() {
       setState(() {});
     });
+
     super.initState();
   }
 
-  //for comment text field
-  FocusNode nodeOne = FocusNode();
-  bool visibilityComment = false;
-  String commentButtonText = "Error";
-
   //for setlist
   bool setListIsExpanded = false;
-
-  //user can add or update a comment for a gig
-  Future postComment(newComment) async {
-    try {
-      await http.post(
-          'https://www.gig-o-matic.com/api/plan/${globals.currentPlanID}/comment',
-          headers: {"cookie": "${globals.cleanedCookie}"},
-          body: {"comment": "$newComment"}).then((response) {
-        if (response.statusCode == 200) {
-          cleanCookie(response.headers["set-cookie"]);
-          saveSessionCookie(globals.cleanedCookie);
-        } else {
-          print('API call failed, response: ${response.statusCode}');
-        }
-      });
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  //user can update their status for a gig
-  Future putStatus(newValue) async {
-    try {
-      await http.put(
-          'https://www.gig-o-matic.com/api/plan/${globals.currentPlanID}/value/$newValue',
-          headers: {"cookie": "${globals.cleanedCookie}"}).then((response) {
-        if (response.statusCode == 200) {
-          cleanCookie(response.headers["set-cookie"]);
-          saveSessionCookie(globals.cleanedCookie);
-        } else {
-          print('API call failed, response: ${response.statusCode}');
-        }
-      });
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  //save session cookie to memory
-  saveSessionCookie(sessionCookie) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      prefs.setString('sessionCookie', sessionCookie);
-    });
-  }
-
-  //function takes section ID and returns a name for that section
-  returnSectionName(id) {
-    //for each section instance in list, if id key equals id, return the name
-    for (int i = 0; i < sectionList.length; i++) {
-      if (id == null) {
-        return "No Section";
-      }
-      if (id == "") {
-        return "No Section";
-      }
-      if (id == sectionList[i].id) {
-        return sectionList[i].name;
-      }
-    }
-  }
-
-  Future<List> fetchGigMemberInfo() async {
-    try {
-      final response = await http.get(
-          'https://www.gig-o-matic.com/api/gig/plans/${globals.currentGigID}',
-          headers: {"cookie": "${globals.cleanedCookie}"});
-      if (response.statusCode == 200) {
-        cleanCookie(response.headers["set-cookie"]);
-        saveSessionCookie(globals.cleanedCookie);
-      } else {
-        print('API call failed, response: ${response.statusCode}');
-      }
-      var decoded = json.decode(response.body.toString());
-      List responseJSON = decoded;
-      List newList = [];
-
-      for (int i = 0; i < responseJSON.length; i++) {
-        Map newMap = {};
-        String name = responseJSON[i]["the_member_name"].toString();
-        newMap["name"] = name;
-        newMap["section"] = returnSectionName(
-            responseJSON[i]["the_plan"]["section"].toString());
-        if (newMap["section"] == null) {
-          newMap["section"] = "";
-        }
-        String value = responseJSON[i]["the_plan"]["value"].toString();
-        newMap["value"] = value;
-
-        String comment = responseJSON[i]["the_plan"]["comment"];
-
-        if (comment != null) {
-          newMap["comment"] = comment;
-        } else {
-          newMap["comment"] = "";
-        }
-
-        newList.add(newMap);
-      }
-      if (newList.length > 1) {
-        newList.sort((a, b) {
-          return a["section"].compareTo(b["section"]);
-        });
-      }
-
-      //Ideally this is where the logic would go to add section headers for each section. However
-      //the newList variable gets polluted somehow after it goes through the loop and can't be manipulated
-      //after the fact. Will address later.
-      //after list is sorted due to section name, the section name would be added to the newList.
-      /*
-      List alterationsList = [];
-
-      for (int i = 1; i < newList.length; i++) {
-        
-        if (newList[i]["section"] != newList[i - 1]["section"]) {
-        Map alterationsMap = <String, dynamic>{};
-        String toAdd = newList[i]["section"];
-        int index = i;
-
-        alterationsMap["index"] = index.toInt();
-
-        alterationsMap["value"] = toAdd;
-        alterationsList.add([index, toAdd]);
-        }
-        
-      }
-      */
-
-      return newList;
-    } catch (e) {
-      print(e);
-    }
-  }
-
+  //has to be declared after initState()
   Future fetchedGigDetails;
 
-  Future<GigInfo> fetchGigDetailsInfo() async {
-    try {
-      final response = await http.get(
-          'https://www.gig-o-matic.com/api/gig/${globals.currentGigID}',
-          headers: {"cookie": "${globals.cleanedCookie}"});
-      if (response.statusCode == 200) {
-        cleanCookie(response.headers["set-cookie"]);
-        saveSessionCookie(globals.cleanedCookie);
-      } else {
-        print('API call failed, response: ${response.statusCode}');
-      }
-
-      return GigInfo.fromJson(json.decode(response.body));
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  //for updating user status
-  Widget newValue = globals.currentPlanIcon;
-  String yourStatus = globals.currentPlanDescription;
-  int newStatus;
+  //to-do: change statusButtons() to class and create a getter for yourStatus attribute
+  //and figure out how to move this to formatTools
+  String userStatus = globals.currentPlanDescription;
   statusButtons() {
+    //for updating user status
+    Widget newValue = globals.currentPlanIcon;
+    int newStatus;
     return new DropdownButton<Widget>(
       items: <Widget>[
         needsValuePlanIconFormatted,
@@ -380,25 +119,25 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
       onChanged: (val) {
         newValue = val;
         if (val == needsValuePlanIconFormatted) {
-          yourStatus = "Needs Input";
+          userStatus = "Needs Input";
           newStatus = 0;
         } else if (val == definitelyPlanIconFormatted) {
-          yourStatus = "Definitely!";
+          userStatus = "Definitely!";
           newStatus = 1;
         } else if (val == probablyPlanIconFormatted) {
-          yourStatus = "Probably";
+          userStatus = "Probably";
           newStatus = 2;
         } else if (val == dontKnowPlanIconFormatted) {
-          yourStatus = "Don't Know";
+          userStatus = "Don't Know";
           newStatus = 3;
         } else if (val == probablyNotPlanIconFormatted) {
-          yourStatus = "Probably Not";
+          userStatus = "Probably Not";
           newStatus = 4;
         } else if (val == cantDoItPlanIconFormatted) {
-          yourStatus = "Can't Do It";
+          userStatus = "Can't Do It";
           newStatus = 5;
         } else if (val == notInterestedPlanIconFormatted) {
-          yourStatus = "Not Interested";
+          userStatus = "Not Interested";
           newStatus = 6;
         }
         putStatus(newStatus);
@@ -563,7 +302,7 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
                               statusButtons(),
-                              new Text(yourStatus,
+                              new Text(userStatus,
                                   style: TextStyle(fontSize: 20.0)),
                             ],
                           ),
