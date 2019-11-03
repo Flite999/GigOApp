@@ -71,11 +71,11 @@ class LoginPageState extends State<LoginPage> {
   }
 
   //loadSessionCookie MUST live here for proper user state initialization!
-  //load saved cookie from memory, if returns 200 on a REST call, move to apphome (checking for valid session cookie)
+  //load saved cookie from memory, check for valid session, and move to home screen if valid
   loadSessionCookie() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String sessionCookie = (prefs.getString('sessionCookie') ?? 0);
-    await http.get('https://www.gig-o-matic.com/api/agenda',
+    await http.post('https://www.gig-o-matic.com/api/session',
         headers: {"cookie": "$sessionCookie"}).then((response) {
       if (response.statusCode == 200) {
         cleanCookie(response.headers["set-cookie"]);
