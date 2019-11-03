@@ -128,7 +128,7 @@ Future putStatus(newValue) async {
   }
 }
 
-Future<List> fetchGigMemberInfoNew() async {
+Future<List> fetchGigMemberInfo() async {
   List info;
   try {
     final response = await http.get(

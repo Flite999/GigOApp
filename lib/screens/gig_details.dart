@@ -54,16 +54,11 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
     commentController =
         new TextEditingController(text: globals.currentPlanComment);
 
-    //gather member info for gig on init
-    /*fetchGigMemberInfo().then((result) {
-      setState(() {
-        memberList = result;
-      });
-    });*/
-
     buildGigMemberList().then((result) {
       setState(() {
         memberList = result;
+        //use memberList for critical mass % calculation
+        criticalMassPercent = calculateCriticalMassPercent(memberList);
       });
     });
 
@@ -88,6 +83,8 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
     super.initState();
   }
 
+  //init critical mass percent var
+  int criticalMassPercent;
   //for setlist
   bool setListIsExpanded = false;
   //has to be declared after initState()
@@ -202,7 +199,8 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                           ),
                         ),
                         Divider(),
-                        //gigText(globals.currentGigDate, "Gig Date"),
+                        gigText(criticalMassPercent, "Critical Mass %"),
+                        Divider(),
                         gigText(snapshot.data.gigDate, "Gig Date"),
                         gigText(snapshot.data.gigCallTime, "Call Time"),
                         gigText(snapshot.data.gigSetTime, "Set Time"),

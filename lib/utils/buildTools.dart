@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'package:gig_o/utils/apiTools.dart';
 import 'classes.dart';
 import 'formatTools.dart';
 import 'globals.dart' as globals;
+//import '../screens/gig_details.dart';
 
 //need bandIDs from agenda endpoint to correctly reach out to bandSection endpoint
 compileBandIDs() async {
@@ -124,7 +126,7 @@ Future<GigInfo> buildGigInfo() async {
 
 Future<List> buildGigMemberList() async {
   List newList = [];
-  List json = await fetchGigMemberInfoNew();
+  List json = await fetchGigMemberInfo();
   for (int i = 0; i < json.length; i++) {
     Map newMap = {};
     String name = json[i]["the_member_name"].toString();
@@ -175,4 +177,33 @@ Future<List> buildGigMemberList() async {
         
       }
   */
+}
+
+calculateCriticalMassPercent(memberList) {
+  int memberCount = 0;
+  int countYes = 0;
+  int percent;
+  for (int i = 0; i < memberList.length; i++) {
+    memberCount++;
+    switch (memberList[i]['value']) {
+      case '1':
+        countYes++;
+        break;
+      case '2':
+        countYes++;
+        break;
+      default:
+        break;
+    }
+    /*if (memberList[i]['value'] == "1"  memberList[i]['value'] == "2") {
+      countYes++;
+    }*/
+  }
+  if (memberCount != 0) {
+    percent = ((countYes / memberCount) * 100).round();
+  } else {
+    percent = 0;
+  }
+
+  return percent;
 }
