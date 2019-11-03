@@ -142,7 +142,15 @@ class LoginPageState extends State<LoginPage> {
             border: OutlineInputBorder(),
             filled: true,
             fillColor: Colors.white),
-        validator: (value) => value.isEmpty ? 'Email can\'t be empty' : null,
+        validator: (value) {
+          if (value.isEmpty) {
+            return 'Email can\'t be empty';
+          }
+          if (value.contains(" ")) {
+            return 'Please remove spaces from email address';
+          }
+          return null;
+        },
         controller: emailController,
       ),
       const SizedBox(height: 5.0),
