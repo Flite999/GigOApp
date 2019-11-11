@@ -8,7 +8,6 @@ import 'home.dart';
 import '../utils/globals.dart' as globals;
 import '../utils/sessionTools.dart';
 
-//login_page functions
 launchSignUp() async {
   const url = "https://www.gig-o-matic.com/signup?locale=en";
   if (await canLaunch(url)) {
@@ -42,11 +41,20 @@ class LoginPage extends StatefulWidget {
 }
 
 class LoginPageState extends State<LoginPage> {
+  //init vars for user input
   final formKey = new GlobalKey<FormState>();
   final emailController = new TextEditingController();
   final passwordController = new TextEditingController();
+  //for modal overlay while loading session cookie
+  bool isLoading = false;
 
-  void _showDialog() {
+  void initState() {
+    super.initState();
+    isLoading = true;
+    loadSessionCookie();
+  }
+
+  void _loginFailedDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -65,16 +73,40 @@ class LoginPageState extends State<LoginPage> {
     );
   }
 
-  void initState() {
-    super.initState();
-    loadSessionCookie();
+  Future authenticate(String email, String pass) async {
+    var url = "https://www.gig-o-matic.com/api/authenticate";
+    try {
+      await http.post(url, body: {"email": "$email", "password": "$pass"}).then(
+          (response) {
+        int authenticateReturnCode = response.statusCode;
+        if (authenticateReturnCode == 200) {
+          cleanCookie(response.headers["set-cookie"]);
+          saveSessionCookie(globals.cleanedCookie);
+          goToHomePage();
+        } else {
+          print('Login failed. Please check username and password');
+          _loginFailedDialog();
+        }
+      });
+    } catch (e) {
+      print('Error');
+    }
+  }
+
+  goToHomePage() {
+    return Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => MyHomePage()),
+    );
   }
 
   //loadSessionCookie MUST live here for proper user state initialization!
-  //load saved cookie from memory, check for valid session, and move to home screen if valid
-  loadSessionCookie() async {
+  void loadSessionCookie() async {
+    //load cookie from memory
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String sessionCookie = (prefs.getString('sessionCookie') ?? 0);
+
+    //check session endpoint for active session with cookie
     await http.post('https://www.gig-o-matic.com/api/session',
         headers: {"cookie": "$sessionCookie"}).then((response) {
       if (response.statusCode == 200) {
@@ -82,11 +114,29 @@ class LoginPageState extends State<LoginPage> {
         saveSessionCookie(globals.cleanedCookie);
         goToHomePage();
       }
+      //if stored cookie not a valid session, send to login screen
+      setState(() {
+        isLoading = false;
+      });
     });
   }
 
+  //to-do: if there is an active login session, login screen flashes briefly before moving to home page-would like to fix that
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return new Stack(
+        children: [
+          new Opacity(
+            opacity: 0.3,
+            child: const ModalBarrier(dismissible: false, color: Colors.grey),
+          ),
+          new Center(
+            child: new CircularProgressIndicator(),
+          ),
+        ],
+      );
+    }
     return new Scaffold(
       appBar: new AppBar(
         automaticallyImplyLeading: false,
@@ -103,33 +153,6 @@ class LoginPageState extends State<LoginPage> {
               children: buildInputs() + buildSubmitButtons() + buildFooter(),
             ),
           )),
-    );
-  }
-
-  Future authenticate(String email, String pass) async {
-    var url = "https://www.gig-o-matic.com/api/authenticate";
-    try {
-      await http.post(url, body: {"email": "$email", "password": "$pass"}).then(
-          (response) {
-        int authenticateReturnCode = response.statusCode;
-        if (authenticateReturnCode == 200) {
-          cleanCookie(response.headers["set-cookie"]);
-          saveSessionCookie(globals.cleanedCookie);
-          goToHomePage();
-        } else {
-          print('Login failed. Please check username and password');
-          _showDialog();
-        }
-      });
-    } catch (e) {
-      print('Error');
-    }
-  }
-
-  goToHomePage() {
-    return Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => MyHomePage()),
     );
   }
 
