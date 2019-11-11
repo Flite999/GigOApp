@@ -26,7 +26,3 @@ Gig-O-Matic is a gig planning tool for marching/brass bands. If you'd like to pr
 user: gigOTestUser@gmail.com
 password: mycoolpassword
 
-## current status
-
-beta v2, v1 release coming soon...
-
