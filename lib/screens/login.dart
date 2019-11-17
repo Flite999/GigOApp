@@ -104,7 +104,8 @@ class LoginPageState extends State<LoginPage> {
   void loadSessionCookie() async {
     //load cookie from memory
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String sessionCookie = (prefs.getString('sessionCookie') ?? 0);
+    //to-do: randomly got int value for sessionCookie (not sure why), so updated to var to accept either string or int.
+    var sessionCookie = (prefs.getString('sessionCookie') ?? 0);
 
     //check session endpoint for active session with cookie
     await http.post('https://www.gig-o-matic.com/api/session',

@@ -76,63 +76,67 @@ List buildGigMemberSectionList(gigMemberList) {
 }
 
 Future<List> buildGigMemberList() async {
-  List newList = [];
-  List json = await fetchGigMemberInfo();
+  List gigMemberList = [];
+  List gigMemberInfo = await fetchGigMemberInfo();
 
-  for (int i = 0; i < json.length; i++) {
-    Map newMap = {};
-    String name = json[i]["the_member_name"].toString();
-    newMap["name"] = name;
-    newMap["section"] =
-        returnSectionName(json[i]["the_plan"]["section"].toString());
-    if (newMap["section"] == null) {
-      newMap["section"] = "";
+  for (int i = 0; i < gigMemberInfo.length; i++) {
+    //to-do: this map construction should be abstracted to a class
+    Map memberMap = {};
+
+    //buil name
+    String name = gigMemberInfo[i]["the_member_name"].toString();
+    memberMap["name"] = name;
+
+    //build section and check for null
+    memberMap["section"] =
+        returnSectionName(gigMemberInfo[i]["the_plan"]["section"].toString());
+    if (memberMap["section"] == null) {
+      memberMap["section"] = "";
     }
-    String value = json[i]["the_plan"]["value"].toString();
-    newMap["value"] = value;
 
-    String comment = json[i]["the_plan"]["comment"];
+    //build response
+    String value = gigMemberInfo[i]["the_plan"]["value"].toString();
+    memberMap["value"] = value;
 
+    //build comment and check for null
+    String comment = gigMemberInfo[i]["the_plan"]["comment"];
     if (comment != null) {
-      newMap["comment"] = comment;
+      memberMap["comment"] = comment;
     } else {
-      newMap["comment"] = "";
+      memberMap["comment"] = "";
     }
 
-    newList.add(newMap);
+    gigMemberList.add(memberMap);
   }
 
-  List gigMemberSectionList = buildGigMemberSectionList(newList);
-  print(gigMemberSectionList);
+  List gigMemberSectionList = buildGigMemberSectionList(gigMemberList);
 
-  if (newList.length > 1) {
-    newList.sort((a, b) {
+  //sort section alphabetically
+  if (gigMemberList.length > 1) {
+    gigMemberList.sort((a, b) {
       return a["section"].compareTo(b["section"]);
     });
   }
-  return newList;
-  //Ideally this function is where the logic would go to add section headers for each section. However
-  //the newList variable gets polluted somehow after it goes through the loop and can't be manipulated
-  //after the fact. Will address later.
-  //after list is sorted due to section name, the section name would be added to the newList.
-  /*
-      List alterationsList = [];
 
-      for (int i = 1; i < newList.length; i++) {
-        
-        if (newList[i]["section"] != newList[i - 1]["section"]) {
-        Map alterationsMap = <String, dynamic>{};
-        String toAdd = newList[i]["section"];
-        int index = i;
+  List compiledGigMemberList = [];
+  for (int x = 0; x < gigMemberSectionList.length; x++) {
+    List sectionList = [];
+    String sectionTitle = gigMemberSectionList[x];
+    Map sectionMap = {};
+    sectionMap['sectionTitle'] = sectionTitle;
+    Map memberMap;
 
-        alterationsMap["index"] = index.toInt();
-
-        alterationsMap["value"] = toAdd;
-        alterationsList.add([index, toAdd]);
-        }
-        
+    for (int y = 0; y < gigMemberList.length; y++) {
+      if (gigMemberSectionList[x] == gigMemberList[y]['section']) {
+        memberMap = gigMemberList[y];
+        sectionList.add(memberMap);
       }
-  */
+    }
+
+    sectionMap['members'] = sectionList;
+    compiledGigMemberList.add(sectionMap);
+  }
+  return compiledGigMemberList;
 }
 
 //to-do: works for now, but need to change function to a List object, shouldn't be a future

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:gig_o/utils/buildTools.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -141,6 +142,35 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
         setState(() {});
       },
     );
+  }
+
+  //for constructing members of each section
+  buildMembers(List members) {
+    return Column(
+        children: members
+            .map((members) => Column(
+                  children: <Widget>[
+                    Row(children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.only(right: 15.0),
+                        child: Text(
+                          '${members['name']}',
+                          style: TextStyle(fontSize: 20.0),
+                        ),
+                      ),
+                      Container(
+                        child: planValueIcons('${members["value"]}'),
+                      ),
+                    ]),
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      margin: EdgeInsets.only(top: 10.0, bottom: 10.0),
+                      child: Text('${members["comment"]}',
+                          style: TextStyle(fontSize: 15.0)),
+                    ),
+                  ],
+                ))
+            .toList());
   }
 
   Widget build(BuildContext context) {
@@ -366,6 +396,7 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                         Divider(),
                         gigTextHeader("Plans"),
                         Container(margin: EdgeInsets.only(bottom: 20.0)),
+                        //build member list for gig
                         ListView.builder(
                           //need the physics property set otherwise you will hit an infinity error and can't scroll up!
                           physics: ClampingScrollPhysics(),
@@ -384,38 +415,9 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                                 ),
                                 padding: EdgeInsets.only(left: 10.0),
                                 child: Column(children: <Widget>[
-                                  Container(
-                                    child: Row(
-                                      children: <Widget>[
-                                        Container(
-                                          margin: EdgeInsets.only(right: 15.0),
-                                          child: Text(
-                                            '${memberList[index]["name"]}',
-                                            style: TextStyle(fontSize: 20.0),
-                                          ),
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.only(right: 15.0),
-                                          child: Text(
-                                            '${memberList[index]["section"]}',
-                                            style: TextStyle(fontSize: 15.0),
-                                          ),
-                                        ),
-                                        Container(
-                                          child: planValueIcons(
-                                              '${memberList[index]["value"]}'),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    alignment: Alignment.centerLeft,
-                                    margin: EdgeInsets.only(
-                                        top: 10.0, bottom: 10.0),
-                                    child: Text(
-                                        '${memberList[index]["comment"]}',
-                                        style: TextStyle(fontSize: 15.0)),
-                                  ),
+                                  gigTextHeader(
+                                      '${memberList[index]["sectionTitle"]}'),
+                                  buildMembers(memberList[index]["members"]),
                                 ]));
                           },
                         ),
