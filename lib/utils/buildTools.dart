@@ -1,4 +1,5 @@
 import 'dart:async' show Future;
+import 'package:flutter/material.dart';
 import 'package:gig_o/utils/apiTools.dart';
 import 'classes.dart';
 import 'formatTools.dart';
@@ -88,6 +89,7 @@ Future<List> buildGigMemberList(gigID) async {
     memberMap["name"] = name;
 
     //build section and check for null
+
     memberMap["section"] =
         returnSectionName(gigMemberInfo[i]["the_plan"]["section"].toString());
     if (memberMap["section"] == null) {
@@ -142,13 +144,20 @@ Future<List> buildGigMemberList(gigID) async {
 //to-do: works for now, but need to change function to a List object, shouldn't be a future
 Future<List> buildSectionList() async {
   List bandIDs = await compileBandIDs();
-  Map bandSectionMap = await fetchBandSections(bandIDs);
-  List bandSections = bandSectionMap["sections"];
+  List bandSections = [];
+  for (int i = 0; i < bandIDs.length; i++) {
+    Map bandSectionMap = await fetchBandSections(bandIDs[i]);
+    bandSections.add(bandSectionMap["sections"]);
+  }
+  //flatten bandSections list
+  List flattenedBandSections =
+      bandSections.expand((bandSections) => bandSections).toList();
+
   List<Section> list = new List();
 
-  for (int i = 0; i < bandSections.length; i++) {
-    String name = bandSections[i]["name"];
-    String id = bandSections[i]['id'];
+  for (int i = 0; i < flattenedBandSections.length; i++) {
+    String name = flattenedBandSections[i]["name"];
+    String id = flattenedBandSections[i]['id'];
     Section section = new Section(
       name: name,
       id: id,
@@ -172,6 +181,7 @@ compileBandIDs() async {
     String bandID = upcomingPlans[i]["gig"]["band"].toString();
     compiledBandIDs.add(bandID);
   }
+
   return compiledBandIDs.toSet().toList();
 }
 

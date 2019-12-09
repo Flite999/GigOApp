@@ -65,19 +65,18 @@ class MyHomePageState extends State<MyHomePage> {
                   itemCount: snapshot.data.length,
                   itemBuilder: (content, index) {
                     return new Container(
-                        margin: EdgeInsets.only(bottom: 5.0),
+                        margin: EdgeInsets.only(top: 10.0),
                         decoration: new BoxDecoration(
-                          border: new Border(
-                            left: new BorderSide(
-                                color: Colors.grey,
-                                width: 5.0,
-                                style: BorderStyle.solid),
-                          ),
+                          borderRadius: new BorderRadius.circular(15.0),
+                          border: Border.all(
+                              color: Colors.green,
+                              width: 2.0,
+                              style: BorderStyle.solid),
                         ),
                         child: new Column(children: <Widget>[
                           Container(
                             margin: EdgeInsets.only(
-                                top: 15.0, bottom: 10.0, left: 5.0, right: 5.0),
+                                top: 15.0, left: 5.0, right: 5.0),
                             child: new Row(children: [
                               Container(
                                 alignment: Alignment.centerLeft,
@@ -96,7 +95,7 @@ class MyHomePageState extends State<MyHomePage> {
                                               fontSize: 19.0,
                                               fontWeight: FontWeight.bold)),
                                       onPressed: () {
-                                        //create a data object here with all the current gig vars and pass to gig details page
+                                        //create a data object here with all the current gig vars and pass to gig details page...todo-explore just using the gig class used for building the gig list instead of the GigData class
                                         final gigData = GigData(
                                             currentBandName: snapshot
                                                 .data[index].bandLongName,

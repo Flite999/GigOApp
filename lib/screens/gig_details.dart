@@ -64,6 +64,8 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
     buildGigMemberList(gigData.currentGigID).then((result) {
       setState(() {
         memberList = result;
+        print('memberlist');
+        print(memberList);
         //use memberList for critical mass % calculation
         criticalMassPercent = calculateCriticalMassPercent(memberList);
       });
@@ -353,14 +355,13 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                           itemCount: memberList.length,
                           itemBuilder: (context, index) {
                             return Container(
-                                margin: EdgeInsets.only(bottom: 5.0),
+                                margin: EdgeInsets.only(top: 10.0),
                                 decoration: new BoxDecoration(
-                                  border: new Border(
-                                    left: new BorderSide(
-                                        color: Colors.grey,
-                                        width: 5.0,
-                                        style: BorderStyle.solid),
-                                  ),
+                                  borderRadius: new BorderRadius.circular(15.0),
+                                  border: Border.all(
+                                      color: Colors.green,
+                                      width: 2.0,
+                                      style: BorderStyle.solid),
                                 ),
                                 padding: EdgeInsets.only(left: 10.0),
                                 child: Column(children: <Widget>[

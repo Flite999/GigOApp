@@ -34,23 +34,22 @@ Future<Map> fetchAgenda() async {
   return agenda;
 }
 
-Future<Map> fetchBandSections(bandIDs) async {
+Future<Map> fetchBandSections(bandID) async {
   Map decoded;
-  for (int i = 0; i < bandIDs.length; i++) {
-    try {
-      final response = await http.get(
-          'https://www.gig-o-matic.com/api/band/${bandIDs[i]}',
-          headers: {"cookie": "${globals.cleanedCookie}"});
-      if (response.statusCode == 200) {
-        cleanCookie(response.headers["set-cookie"]);
-        saveSessionCookie(globals.cleanedCookie);
-      } else {
-        print('API call failed, response: ${response.statusCode}');
-      }
-      decoded = json.decode(response.body.toString());
-    } catch (e) {
-      print("fetch Band Section New error: $e");
+
+  try {
+    final response = await http.get(
+        'https://www.gig-o-matic.com/api/band/$bandID',
+        headers: {"cookie": "${globals.cleanedCookie}"});
+    if (response.statusCode == 200) {
+      cleanCookie(response.headers["set-cookie"]);
+      saveSessionCookie(globals.cleanedCookie);
+    } else {
+      print('API call failed, response: ${response.statusCode}');
     }
+    decoded = json.decode(response.body.toString());
+  } catch (e) {
+    print("fetch Band Section error: $e");
   }
   return decoded;
 }
