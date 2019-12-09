@@ -128,6 +128,7 @@ class LoginPageState extends State<LoginPage> {
     if (isLoading) {
       return new Stack(
         children: [
+          //todo: more performant if you DON'T use opacity widget: https://api.flutter.dev/flutter/widgets/Opacity-class.html#transparent-image
           new Opacity(
             opacity: 0.3,
             child: const ModalBarrier(dismissible: false, color: Colors.grey),

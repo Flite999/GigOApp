@@ -9,7 +9,7 @@ import 'sessionTools.dart';
 import 'formatTools.dart';
 import 'classes.dart';
 
-//to-do: the fetch code is very repeatable/simiar, can consolidate to one function with input params
+//todo: the fetch code is very repeatable/simiar, can consolidate to one function with input params
 
 deserializeJSON(response) {
   Map decoded = json.decode(response.body.toString());
@@ -92,10 +92,9 @@ class LogoutTile extends StatelessWidget {
 }
 
 //user can add or update a comment for a gig
-Future postComment(newComment) async {
+Future postComment(newComment, planID) async {
   try {
-    await http.post(
-        'https://www.gig-o-matic.com/api/plan/${globals.currentPlanID}/comment',
+    await http.post('https://www.gig-o-matic.com/api/plan/$planID/comment',
         headers: {"cookie": "${globals.cleanedCookie}"},
         body: {"comment": "$newComment"}).then((response) {
       if (response.statusCode == 200) {
@@ -111,10 +110,10 @@ Future postComment(newComment) async {
 }
 
 //user can update their status for a gig
-Future putStatus(newValue) async {
+Future putStatus(newValue, planID) async {
   try {
     await http.put(
-        'https://www.gig-o-matic.com/api/plan/${globals.currentPlanID}/value/$newValue',
+        'https://www.gig-o-matic.com/api/plan/$planID/value/$newValue',
         headers: {"cookie": "${globals.cleanedCookie}"}).then((response) {
       if (response.statusCode == 200) {
         cleanCookie(response.headers["set-cookie"]);
@@ -128,16 +127,17 @@ Future putStatus(newValue) async {
   }
 }
 
-Future<List> fetchGigMemberInfo() async {
+Future<List> fetchGigMemberInfo(gigID) async {
   List info;
   try {
     final response = await http.get(
-        'https://www.gig-o-matic.com/api/gig/plans/${globals.currentGigID}',
+        'https://www.gig-o-matic.com/api/gig/plans/$gigID',
         headers: {"cookie": "${globals.cleanedCookie}"});
     if (response.statusCode == 200) {
       cleanCookie(response.headers["set-cookie"]);
       saveSessionCookie(globals.cleanedCookie);
     } else {
+      print('error here');
       print('API call failed, response: ${response.statusCode}');
     }
     //can't use the deserialize function here because the plans endpoint returns a List, not Map
@@ -148,11 +148,11 @@ Future<List> fetchGigMemberInfo() async {
   return info;
 }
 
-Future<Map> fetchGigDetails() async {
+Future<Map> fetchGigDetails(gigID) async {
   Map json;
   try {
     final response = await http.get(
-        'https://www.gig-o-matic.com/api/gig/${globals.currentGigID}',
+        'https://www.gig-o-matic.com/api/gig/${gigID}',
         headers: {"cookie": "${globals.cleanedCookie}"});
     if (response.statusCode == 200) {
       cleanCookie(response.headers["set-cookie"]);

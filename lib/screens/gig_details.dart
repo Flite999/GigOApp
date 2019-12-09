@@ -1,18 +1,15 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:gig_o/utils/buildTools.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../utils/globals.dart' as globals;
 import '../utils/formatTools.dart';
 import '../utils/apiTools.dart';
 import 'home.dart';
 import '../utils/classes.dart';
+import '../utils/statusButtons.dart';
 
 //to-do: see how much you can break out the animation code to utils/animationTools.dart
 
-//for user update on gig status
-TextEditingController commentController;
 //initialize memberList on each gig_details page load
 List memberList = [];
 
@@ -21,11 +18,20 @@ Animation<double> _fabScale;
 AnimationController animationController;
 
 class GigDetails extends StatefulWidget {
+  //to pass in selected gig gigData from home screen
+  final GigData gigData;
+  const GigDetails({Key key, this.gigData}) : super(key: key);
   @override
-  State<StatefulWidget> createState() => new GigDetailsState();
+  State<StatefulWidget> createState() =>
+      new GigDetailsState(gigData: this.gigData);
 }
 
 class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
+  final GigData gigData;
+  GigDetailsState({this.gigData});
+
+  //for user update on gig status
+  TextEditingController commentController;
   @override
   void dispose() {
     // Clean up the controller when the Widget is disposed
@@ -40,11 +46,11 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
 
   //hiding or showing comment text field depending on user comment entered for gig or not
   void _currentPlanComment() {
-    if (globals.currentPlanComment != "") {
+    if (gigData.currentPlanComment != "") {
       visibilityComment = true;
       commentButtonText = "Edit Comment";
     }
-    if (globals.currentPlanComment == "") {
+    if (gigData.currentPlanComment == "") {
       visibilityComment = false;
       commentButtonText = "Submit Comment";
     }
@@ -53,9 +59,9 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
   void initState() {
     //build comment widget
     commentController =
-        new TextEditingController(text: globals.currentPlanComment);
+        new TextEditingController(text: gigData.currentPlanComment);
 
-    buildGigMemberList().then((result) {
+    buildGigMemberList(gigData.currentGigID).then((result) {
       setState(() {
         memberList = result;
         //use memberList for critical mass % calculation
@@ -64,7 +70,7 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
     });
 
     //cache gig details so gig details are fetched once on page init
-    fetchedGigDetails = buildGigInfo();
+    fetchedGigDetails = buildGigInfo(gigData.currentGigID);
     _currentPlanComment();
 
     //animation setup for check icon to confirm user comment input sent
@@ -90,59 +96,6 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
   bool setListIsExpanded = false;
   //has to be declared after initState()
   Future fetchedGigDetails;
-
-  //to-do: change statusButtons() to class and create a getter for yourStatus attribute
-  //and figure out how to move this to formatTools
-  String userStatus = globals.currentPlanDescription;
-  statusButtons() {
-    //for updating user status
-    Widget newValue = globals.currentPlanIcon;
-    int newStatus;
-    return new DropdownButton<Widget>(
-      items: <Widget>[
-        needsValuePlanIconFormatted,
-        definitelyPlanIconFormatted,
-        probablyPlanIconFormatted,
-        dontKnowPlanIconFormatted,
-        probablyNotPlanIconFormatted,
-        cantDoItPlanIconFormatted,
-        notInterestedPlanIconFormatted,
-      ].map((Widget val) {
-        return new DropdownMenuItem<Widget>(
-          value: val,
-          child: val,
-        );
-      }).toList(),
-      value: newValue,
-      onChanged: (val) {
-        newValue = val;
-        if (val == needsValuePlanIconFormatted) {
-          userStatus = "Needs Input";
-          newStatus = 0;
-        } else if (val == definitelyPlanIconFormatted) {
-          userStatus = "Definitely!";
-          newStatus = 1;
-        } else if (val == probablyPlanIconFormatted) {
-          userStatus = "Probably";
-          newStatus = 2;
-        } else if (val == dontKnowPlanIconFormatted) {
-          userStatus = "Don't Know";
-          newStatus = 3;
-        } else if (val == probablyNotPlanIconFormatted) {
-          userStatus = "Probably Not";
-          newStatus = 4;
-        } else if (val == cantDoItPlanIconFormatted) {
-          userStatus = "Can't Do It";
-          newStatus = 5;
-        } else if (val == notInterestedPlanIconFormatted) {
-          userStatus = "Not Interested";
-          newStatus = 6;
-        }
-        putStatus(newStatus);
-        setState(() {});
-      },
-    );
-  }
 
   //for constructing members of each section
   buildMembers(List members) {
@@ -181,6 +134,7 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
         //that will do so
         automaticallyImplyLeading: false,
         backgroundColor: Colors.blue,
+
         title: Row(children: [
           Container(
             child: FlatButton(
@@ -196,7 +150,7 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
           Expanded(
             child: Container(
               child: Text(
-                globals.currentBandName,
+                gigData.currentBandName,
                 softWrap: true,
               ),
             ),
@@ -214,7 +168,7 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                   children: <Widget>[
                     Column(
                       children: <Widget>[
-                        gigTextHeader(globals.currentGigTitle),
+                        gigTextHeader(gigData.currentGigTitle),
                         Container(
                           margin: EdgeInsets.all(10.0),
                           child: Row(
@@ -324,17 +278,11 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
 
                         Divider(),
                         gigTextHeader("Your Status: "),
-                        Container(
-                          margin: EdgeInsets.all(10.0),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              statusButtons(),
-                              new Text(userStatus,
-                                  style: TextStyle(fontSize: 20.0)),
-                            ],
-                          ),
-                        ),
+                        StatusButtons(
+                            userStatus: gigData.currentPlanDescription,
+                            newValue: gigData.currentPlanIcon,
+                            planID: gigData.currentPlanID),
+
                         //if there is a comment, reveal the comment in textfield, if not, hide text field
                         visibilityComment
                             ? Row(
@@ -347,7 +295,8 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                                         focusNode: nodeOne,
                                         controller: commentController,
                                         onSubmitted: (val) {
-                                          postComment(val);
+                                          postComment(
+                                              val, gigData.currentPlanID);
                                           //fire the check icon
                                           animationController.forward();
                                         },

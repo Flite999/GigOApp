@@ -1,11 +1,34 @@
 import 'package:flutter/material.dart';
 import 'gig_details.dart';
-import '../utils/globals.dart' as globals;
 import 'dart:async';
 import '../utils/formatTools.dart';
 import '../utils/classes.dart';
 import '../utils/apiTools.dart';
 import '../utils/buildTools.dart';
+import '../utils/statusButtons.dart';
+
+//GigData class for passing data from home screen to gig details page
+class GigData {
+  String currentBandName;
+  String currentBandID;
+  String currentPlanComment;
+  String currentPlanID;
+  String currentPlanDescription;
+  var currentPlanIcon;
+  String currentPlanValue;
+  String currentGigTitle;
+  String currentGigID;
+  GigData(
+      {this.currentBandID,
+      this.currentPlanComment,
+      this.currentPlanID,
+      this.currentPlanDescription,
+      this.currentPlanIcon,
+      this.currentPlanValue,
+      this.currentGigID,
+      this.currentGigTitle,
+      this.currentBandName});
+}
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -70,34 +93,35 @@ class MyHomePageState extends State<MyHomePage> {
                                           style: TextStyle(
                                               color: Color.fromRGBO(
                                                   14, 39, 96, 1.0),
-                                              fontSize: 17.0,
+                                              fontSize: 19.0,
                                               fontWeight: FontWeight.bold)),
                                       onPressed: () {
-                                        //To Gig Details->global variables passed from here to specific gig details
-                                        globals.currentBandName =
-                                            snapshot.data[index].bandLongName;
-                                        globals.currentBandID =
-                                            snapshot.data[index].bandID;
-                                        globals.currentPlanComment =
-                                            snapshot.data[index].planComment;
-                                        globals.currentPlanID =
-                                            snapshot.data[index].planID;
-                                        globals.currentPlanDescription =
-                                            snapshot.data[index].planValueLabel;
-                                        globals.currentPlanIcon =
-                                            planValueIcons(
-                                                snapshot.data[index].planValue);
-                                        globals.currentPlanValue =
-                                            snapshot.data[index].planValue;
-                                        globals.currentGigTitle =
-                                            snapshot.data[index].title;
-                                        globals.currentGigID =
-                                            snapshot.data[index].gigID;
+                                        //create a data object here with all the current gig vars and pass to gig details page
+                                        final gigData = GigData(
+                                            currentBandName: snapshot
+                                                .data[index].bandLongName,
+                                            currentBandID:
+                                                snapshot.data[index].bandID,
+                                            currentPlanComment: snapshot
+                                                .data[index].planComment,
+                                            currentPlanID:
+                                                snapshot.data[index].planID,
+                                            currentPlanDescription: snapshot
+                                                .data[index].planValueLabel,
+                                            currentPlanIcon: planValueIcons(
+                                                snapshot.data[index].planValue),
+                                            currentPlanValue:
+                                                snapshot.data[index].planValue,
+                                            currentGigTitle:
+                                                snapshot.data[index].title,
+                                            currentGigID:
+                                                snapshot.data[index].gigID);
                                         Navigator.push(
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) =>
-                                                    GigDetails()));
+                                                    GigDetails(
+                                                        gigData: gigData)));
                                       }),
                                 ),
                               ),
@@ -109,33 +133,40 @@ class MyHomePageState extends State<MyHomePage> {
                           Container(
                             padding: EdgeInsets.only(left: 15.0),
                             child: new Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Container(
-                                      child: Expanded(
+                                    padding: EdgeInsets.only(right: 15.0),
                                     child: Text(snapshot.data[index].date,
                                         softWrap: true,
                                         style: TextStyle(
                                           fontSize: 15.0,
                                         )),
-                                  )),
-                                  new Divider(),
-                                  Container(
-                                    child: planValueIcons(
-                                        snapshot.data[index].planValue),
                                   ),
+                                  StatusButtons(
+                                      planID: snapshot.data[index].planID,
+                                      userStatus:
+                                          snapshot.data[index].planValueLabel,
+                                      newValue: planValueIcons(
+                                          snapshot.data[index].planValue)),
                                   new Divider(),
-                                  Expanded(
-                                    child: Container(
-                                      padding: EdgeInsets.all(5.0),
-                                      margin: EdgeInsets.only(left: 5.0),
-                                      child: new Text(
-                                          snapshot.data[index].planComment),
-                                    ),
-                                  )
                                 ]),
                           ),
+                          Container(
+                            child: new Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: Container(
+                                    padding: EdgeInsets.all(5.0),
+                                    margin: EdgeInsets.only(left: 5.0),
+                                    child: new Text(
+                                        snapshot.data[index].planComment,
+                                        style: TextStyle(fontSize: 17.0)),
+                                  ),
+                                )
+                              ],
+                            ),
+                          )
                         ]));
                   });
             } else if (snapshot.hasError) {
@@ -200,7 +231,7 @@ class MyHomePageState extends State<MyHomePage> {
               Container(
                 padding: EdgeInsets.only(left: 15.0),
                 alignment: Alignment.bottomLeft,
-                child: Text("App Version: 1.0"),
+                child: Text("App Version: 1.5"),
               ),
             ],
           ),

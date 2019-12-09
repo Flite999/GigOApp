@@ -4,9 +4,9 @@ import 'classes.dart';
 import 'formatTools.dart';
 import 'globals.dart' as globals;
 
-Future<GigInfo> buildGigInfo() async {
+Future<GigInfo> buildGigInfo(gigID) async {
   var gigInfo = new GigInfo();
-  Map json = await fetchGigDetails();
+  Map json = await fetchGigDetails(gigID);
   gigInfo = GigInfo.fromJson(json);
   return gigInfo;
 }
@@ -75,15 +75,15 @@ List buildGigMemberSectionList(gigMemberList) {
   return finalList;
 }
 
-Future<List> buildGigMemberList() async {
+Future<List> buildGigMemberList(gigID) async {
   List gigMemberList = [];
-  List gigMemberInfo = await fetchGigMemberInfo();
+  List gigMemberInfo = await fetchGigMemberInfo(gigID);
 
   for (int i = 0; i < gigMemberInfo.length; i++) {
     //to-do: this map construction should be abstracted to a class
     Map memberMap = {};
 
-    //buil name
+    //build name
     String name = gigMemberInfo[i]["the_member_name"].toString();
     memberMap["name"] = name;
 
@@ -191,9 +191,6 @@ calculateCriticalMassPercent(memberList) {
       default:
         break;
     }
-    /*if (memberList[i]['value'] == "1"  memberList[i]['value'] == "2") {
-      countYes++;
-    }*/
   }
   if (memberCount != 0) {
     percent = ((countYes / memberCount) * 100).round();
