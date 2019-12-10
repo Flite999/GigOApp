@@ -6,6 +6,7 @@ import '../utils/classes.dart';
 import '../utils/apiTools.dart';
 import '../utils/buildTools.dart';
 import '../utils/statusButtons.dart';
+import '../utils/gigComment.dart';
 
 //GigData class for passing data from home screen to gig details page
 class GigData {
@@ -151,21 +152,10 @@ class MyHomePageState extends State<MyHomePage> {
                                   new Divider(),
                                 ]),
                           ),
-                          Container(
-                            child: new Row(
-                              children: <Widget>[
-                                Expanded(
-                                  child: Container(
-                                    padding: EdgeInsets.all(5.0),
-                                    margin: EdgeInsets.only(left: 5.0),
-                                    child: new Text(
-                                        snapshot.data[index].planComment,
-                                        style: TextStyle(fontSize: 17.0)),
-                                  ),
-                                )
-                              ],
-                            ),
-                          )
+                          //interesting behavior here - when comment is entered and you navigate to gig details, the comment is not updated, due to the listview already built. I don't think rebuilding the listview everytime a comment is updated would be great user experience, so will have to keep thinking about this one. Same behavior for statusbuttons as well, of course.
+                          GigComment(
+                              planComment: snapshot.data[index].planComment,
+                              planID: snapshot.data[index].planID)
                         ]));
                   });
             } else if (snapshot.hasError) {
