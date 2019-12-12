@@ -125,37 +125,48 @@ class LoginPageState extends State<LoginPage> {
   //to-do: if there is an active login session, login screen flashes briefly before moving to home page-would like to fix that
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return new Stack(
-        children: [
-          //todo: more performant if you DON'T use opacity widget: https://api.flutter.dev/flutter/widgets/Opacity-class.html#transparent-image
-          new Opacity(
-            opacity: 0.3,
-            child: const ModalBarrier(dismissible: false, color: Colors.grey),
-          ),
-          new Center(
-            child: new CircularProgressIndicator(),
-          ),
-        ],
-      );
-    }
-    return new Scaffold(
-      appBar: new AppBar(
-        automaticallyImplyLeading: false,
-        title: new Text('Gig-O-Matic',
-            style: new TextStyle(color: Colors.white, fontSize: 30.0)),
-        backgroundColor: Colors.blue,
-      ),
-      body: new Container(
-          padding: EdgeInsets.all(16.0),
-          color: Color.fromRGBO(150, 248, 157, 1.0),
-          child: new Form(
-            key: formKey,
-            child: ListView(
-              children: buildInputs() + buildSubmitButtons() + buildFooter(),
+    return isLoading
+        ? new Scaffold(
+            backgroundColor: Colors.white,
+            body: new Column(
+              //crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                new Text("Checking for Active Session",
+                    style: TextStyle(color: Colors.black, fontSize: 25.0)),
+                Divider(color: Colors.white),
+                new CircularProgressIndicator(
+                  strokeWidth: 3.0,
+                  value: null,
+                  valueColor: new AlwaysStoppedAnimation<Color>(Colors.green),
+                ),
+              ],
             ),
-          )),
-    );
+          )
+        : new Scaffold(
+            appBar: new AppBar(
+              automaticallyImplyLeading: false,
+              title: new Text('Gig-O-Matic',
+                  style: new TextStyle(color: Colors.white, fontSize: 35.0)),
+              backgroundColor: Colors.blue,
+            ),
+            body: new Container(
+                padding: EdgeInsets.all(16.0),
+                decoration: new BoxDecoration(
+                  image: DecorationImage(
+                      image: new AssetImage('images/tuba.jpg'),
+                      fit: BoxFit.contain,
+                      repeat: ImageRepeat.repeat),
+                  shape: BoxShape.circle,
+                ),
+                child: new Form(
+                  key: formKey,
+                  child: ListView(
+                    children:
+                        buildInputs() + buildSubmitButtons() + buildFooter(),
+                  ),
+                )),
+          );
   }
 
   List<Widget> buildInputs() {
@@ -197,7 +208,7 @@ class LoginPageState extends State<LoginPage> {
     return [
       new RaisedButton(
           child: new Text('Login',
-              style: new TextStyle(fontSize: 20.0, color: Colors.white)),
+              style: new TextStyle(fontSize: 25.0, color: Colors.white)),
           color: Colors.blue,
           shape: new RoundedRectangleBorder(
               borderRadius: new BorderRadius.circular(15.0)),
@@ -208,12 +219,12 @@ class LoginPageState extends State<LoginPage> {
           }),
       new FlatButton(
         child: new Text('Create an Account',
-            style: new TextStyle(fontSize: 20.0, color: Colors.black)),
+            style: new TextStyle(fontSize: 25.0, color: Colors.black)),
         onPressed: launchSignUp,
       ),
       new FlatButton(
         child: new Text('Forgot Password?',
-            style: new TextStyle(fontSize: 20.0, color: Colors.black)),
+            style: new TextStyle(fontSize: 25.0, color: Colors.black)),
         onPressed: launchForgotPass,
       ),
     ];
@@ -231,7 +242,7 @@ class LoginPageState extends State<LoginPage> {
                   Expanded(
                     child: new AutoSizeText(
                       "Issues or questions? Contact admins here:",
-                      style: new TextStyle(fontSize: 20.0),
+                      style: new TextStyle(fontSize: 25.0),
                       maxLines: 1,
                     ),
                   ),

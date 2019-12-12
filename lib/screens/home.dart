@@ -39,12 +39,11 @@ class MyHomePage extends StatefulWidget {
 class MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
-    //calls the gig info once and saves it
-    fetchedInfo = buildGigList();
-
     //buildSectionList here for use in rest of the app
     buildSectionList();
     super.initState();
+    //calls the gig info once and saves it
+    fetchedInfo = buildGigList();
   }
 
   //var to store gig info from agenda call.
@@ -144,11 +143,13 @@ class MyHomePageState extends State<MyHomePage> {
                                         )),
                                   ),
                                   StatusButtons(
-                                      planID: snapshot.data[index].planID,
-                                      userStatus:
-                                          snapshot.data[index].planValueLabel,
-                                      newValue: planValueIcons(
-                                          snapshot.data[index].planValue)),
+                                    planID: snapshot.data[index].planID,
+                                    userStatus:
+                                        snapshot.data[index].planValueLabel,
+                                    newValue: planValueIcons(
+                                        snapshot.data[index].planValue),
+                                    bandName: snapshot.data[index].bandLongName,
+                                  ),
                                   new Divider(),
                                 ]),
                           ),
@@ -160,14 +161,24 @@ class MyHomePageState extends State<MyHomePage> {
                   });
             } else if (snapshot.hasError) {
               return new Text("${snapshot.error}");
+            } else {
+              return Center(
+                child: new Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    new Text("Loading Gigs", style: TextStyle(fontSize: 25.0)),
+                    Divider(color: Colors.white),
+                    new CircularProgressIndicator(
+                      strokeWidth: 3.0,
+                      value: null,
+                      valueColor:
+                          new AlwaysStoppedAnimation<Color>(Colors.green),
+                    ),
+                  ],
+                ),
+              );
             }
-            return Center(
-              child: new CircularProgressIndicator(
-                strokeWidth: 3.0,
-                value: null,
-                valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            );
           }),
     );
   }
@@ -210,7 +221,7 @@ class MyHomePageState extends State<MyHomePage> {
                 height: 120.0,
                 child: DrawerHeader(
                   child: Text('Menu',
-                      style: TextStyle(color: Colors.white, fontSize: 18.0)),
+                      style: TextStyle(color: Colors.white, fontSize: 22.0)),
                   decoration: BoxDecoration(
                     color: Colors.blue,
                   ),
@@ -220,7 +231,8 @@ class MyHomePageState extends State<MyHomePage> {
               Container(
                 padding: EdgeInsets.only(left: 15.0),
                 alignment: Alignment.bottomLeft,
-                child: Text("App Version: 1.5"),
+                child:
+                    Text("App Version: 1.5", style: TextStyle(fontSize: 18.0)),
               ),
             ],
           ),

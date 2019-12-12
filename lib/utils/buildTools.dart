@@ -1,5 +1,4 @@
 import 'dart:async' show Future;
-import 'package:flutter/material.dart';
 import 'package:gig_o/utils/apiTools.dart';
 import 'classes.dart';
 import 'formatTools.dart';
@@ -50,6 +49,11 @@ List<Gig> buildGigFromJSON(plans) {
 
 //has to be a future class for the fetchedInfo var to be used in the app_home FutureBuilder Class
 Future<List<Gig>> buildGigList() async {
+  //build band list here, since StatusButtons class needs the global var data in order to render
+  if (globals.bandList == null) {
+    await buildBandList();
+  }
+
   Map json = await fetchAgenda();
   List weighinPlans = json["weighin_plans"];
   List upcomingPlans = json["upcoming_plans"];
@@ -141,12 +145,11 @@ Future<List> buildGigMemberList(gigID) async {
   return compiledGigMemberList;
 }
 
-//to-do: works for now, but need to change function to a List object, shouldn't be a future
-Future<List> buildSectionList() async {
+void buildSectionList() async {
   List bandIDs = await compileBandIDs();
   List bandSections = [];
   for (int i = 0; i < bandIDs.length; i++) {
-    Map bandSectionMap = await fetchBandSections(bandIDs[i]);
+    Map bandSectionMap = await fetchBandInfo(bandIDs[i]);
     bandSections.add(bandSectionMap["sections"]);
   }
   //flatten bandSections list
@@ -165,6 +168,26 @@ Future<List> buildSectionList() async {
     list.add(section);
   }
   globals.sectionList = list;
+}
+
+//build band list, for storing values like simple options preferences
+Future buildBandList() async {
+  List bandIDs = await compileBandIDs();
+  List bandList = [];
+  for (int i = 0; i < bandIDs.length; i++) {
+    Map bandMap = await fetchBandInfo(bandIDs[i]);
+    bandList.add(bandMap);
+  }
+
+  List<Band> list = new List();
+
+  for (int i = 0; i < bandList.length; i++) {
+    String name = bandList[i]["name"];
+    bool simpleOptions = bandList[i]['simple_planning'];
+    Band band = new Band(name: name, simpleOptions: simpleOptions);
+    list.add(band);
+  }
+  globals.bandList = list;
 }
 
 //need bandIDs from agenda endpoint to correctly reach out to bandSection endpoint
@@ -190,16 +213,18 @@ calculateCriticalMassPercent(memberList) {
   int countYes = 0;
   int percent;
   for (int i = 0; i < memberList.length; i++) {
-    memberCount++;
-    switch (memberList[i]['value']) {
-      case '1':
-        countYes++;
-        break;
-      case '2':
-        countYes++;
-        break;
-      default:
-        break;
+    for (int j = 0; j < memberList[i]['members'].length; j++) {
+      memberCount++;
+      switch (memberList[i]['members'][j]['value']) {
+        case '1':
+          countYes++;
+          break;
+        case '2':
+          countYes++;
+          break;
+        default:
+          break;
+      }
     }
   }
   if (memberCount != 0) {

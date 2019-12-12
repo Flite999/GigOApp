@@ -229,6 +229,31 @@ gigText(info, [label]) {
   );
 }
 
+gigTextBold(info, [label]) {
+  var result = "$info";
+
+  if (label != null) {
+    result = "$label: $info";
+  }
+
+  return new Container(
+    margin: EdgeInsets.all(5.0),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        new Expanded(
+            child: new Container(
+          child: new Text(
+            result,
+            softWrap: true,
+            style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+          ),
+        ))
+      ],
+    ),
+  );
+}
+
 gigTextHeader(info) {
   return new Container(
     margin: EdgeInsets.all(5.0),

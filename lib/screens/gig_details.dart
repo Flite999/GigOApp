@@ -134,7 +134,7 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                           ),
                         ),
                         Divider(),
-                        gigText(criticalMassPercent, "Critical Mass %"),
+                        gigTextBold(criticalMassPercent, "Critical Mass % "),
                         Divider(),
                         gigText(snapshot.data.gigDate, "Gig Date"),
                         gigText(snapshot.data.gigCallTime, "Call Time"),
@@ -232,7 +232,8 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                         StatusButtons(
                             userStatus: gigData.currentPlanDescription,
                             newValue: gigData.currentPlanIcon,
-                            planID: gigData.currentPlanID),
+                            planID: gigData.currentPlanID,
+                            bandName: gigData.currentBandName),
                         GigComment(
                             planComment: gigData.currentPlanComment,
                             planID: gigData.currentPlanID),

@@ -34,7 +34,7 @@ Future<Map> fetchAgenda() async {
   return agenda;
 }
 
-Future<Map> fetchBandSections(bandID) async {
+Future<Map> fetchBandInfo(bandID) async {
   Map decoded;
 
   try {
@@ -82,7 +82,7 @@ class LogoutTile extends StatelessWidget {
     return ListTile(
       title: Text('Log Out',
           style: TextStyle(
-              color: Color.fromRGBO(14, 39, 96, 1.0), fontSize: 18.0)),
+              color: Color.fromRGBO(14, 39, 96, 1.0), fontSize: 21.0)),
       onTap: () {
         postLogout();
       },

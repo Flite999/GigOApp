@@ -39,6 +39,13 @@ class Section {
   });
 }
 
+class Band {
+  String name;
+  bool simpleOptions;
+
+  Band({this.name, this.simpleOptions});
+}
+
 class GigInfo {
   String gigStatus;
   String gigBand;
