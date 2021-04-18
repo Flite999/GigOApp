@@ -13,20 +13,20 @@ List memberList = [];
 
 class GigDetails extends StatefulWidget {
   //to pass in selected gig gigData from home screen
-  final GigData gigData;
-  const GigDetails({Key key, this.gigData}) : super(key: key);
+  final GigData? gigData;
+  const GigDetails({Key? key, this.gigData}) : super(key: key);
   @override
   State<StatefulWidget> createState() =>
       new GigDetailsState(gigData: this.gigData);
 }
 
 class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
-  final GigData gigData;
+  final GigData? gigData;
   GigDetailsState({this.gigData});
 
   @override
   void initState() {
-    buildGigMemberList(gigData.currentGigID).then((result) {
+    buildGigMemberList(gigData!.currentGigID).then((result) {
       setState(() {
         memberList = result;
         //use memberList for critical mass % calculation
@@ -35,17 +35,17 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
     });
 
     //cache gig details so gig details are fetched once on page init
-    fetchedGigDetails = buildGigInfo(gigData.currentGigID);
+    fetchedGigDetails = buildGigInfo(gigData!.currentGigID);
 
     super.initState();
   }
 
   //init critical mass percent var
-  int criticalMassPercent;
+  int? criticalMassPercent;
   //for setlist
   bool setListIsExpanded = false;
   //has to be declared after initState()
-  Future fetchedGigDetails;
+  Future? fetchedGigDetails;
 
   //for constructing members of each section
   buildMembers(List members) {
@@ -100,7 +100,7 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
           Expanded(
             child: Container(
               child: Text(
-                gigData.currentBandName,
+                gigData!.currentBandName!,
                 softWrap: true,
               ),
             ),
@@ -111,24 +111,24 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
           color: Colors.white,
           padding: EdgeInsets.all(10.0),
           child: FutureBuilder<GigInfo>(
-            future: fetchedGigDetails,
+            future: fetchedGigDetails as Future<GigInfo>?,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return new ListView(
                   children: <Widget>[
                     Column(
                       children: <Widget>[
-                        gigTextHeader(gigData.currentGigTitle),
+                        gigTextHeader(gigData!.currentGigTitle),
 
                         Container(
                           margin: EdgeInsets.all(10.0),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
-                              statusIcons(snapshot.data.gigStatus),
+                              statusIcons(snapshot.data!.gigStatus),
                               Container(
                                 margin: EdgeInsets.only(left: 5.0),
-                                child: statusText(snapshot.data.gigStatus),
+                                child: statusText(snapshot.data!.gigStatus),
                               ),
                             ],
                           ),
@@ -136,10 +136,10 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                         Divider(),
                         gigTextBold(criticalMassPercent, "Critical Mass % "),
                         Divider(),
-                        gigText(snapshot.data.gigDate, "Gig Date"),
-                        gigText(snapshot.data.gigCallTime, "Call Time"),
-                        gigText(snapshot.data.gigSetTime, "Set Time"),
-                        gigText(snapshot.data.gigEndTime, "End Time"),
+                        gigText(snapshot.data!.gigDate, "Gig Date"),
+                        gigText(snapshot.data!.gigCallTime, "Call Time"),
+                        gigText(snapshot.data!.gigSetTime, "Set Time"),
+                        gigText(snapshot.data!.gigEndTime, "End Time"),
                         new Container(
                           margin: EdgeInsets.all(5.0),
                           child: Row(
@@ -155,7 +155,7 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                               new Expanded(
                                   child: new Container(
                                 child: FlatButton(
-                                  child: Text("${snapshot.data.gigAddress}",
+                                  child: Text("${snapshot.data!.gigAddress}",
                                       style: TextStyle(
                                           color:
                                               Color.fromRGBO(14, 39, 96, 1.0),
@@ -163,9 +163,9 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                                           fontWeight: FontWeight.bold)),
                                   onPressed: () async {
                                     if (await canLaunch(
-                                        "${snapshot.data.gigAddressLink}")) {
+                                        "${snapshot.data!.gigAddressLink}")) {
                                       await launch(
-                                          "${snapshot.data.gigAddressLink}");
+                                          "${snapshot.data!.gigAddressLink}");
                                     }
                                   },
                                 ),
@@ -173,12 +173,12 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                             ],
                           ),
                         ),
-                        gigText(snapshot.data.gigPaid, "Pay"),
-                        gigText(snapshot.data.gigLeader, "Leader"),
-                        gigText(snapshot.data.gigPostGig, "Post-Gig Plans"),
+                        gigText(snapshot.data!.gigPaid, "Pay"),
+                        gigText(snapshot.data!.gigLeader, "Leader"),
+                        gigText(snapshot.data!.gigPostGig, "Post-Gig Plans"),
                         Divider(),
                         gigTextHeader("Details"),
-                        gigText(snapshot.data.gigDetails),
+                        gigText(snapshot.data!.gigDetails),
                         Divider(),
                         setListIsExpanded
                             ? Column(
@@ -202,7 +202,7 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                                           )),
                                     ],
                                   ),
-                                  gigText(snapshot.data.gigSetList),
+                                  gigText(snapshot.data!.gigSetList),
                                 ],
                               )
                             : Row(
@@ -230,13 +230,13 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                         Divider(),
                         gigTextHeader("Your Status: "),
                         StatusButtons(
-                            userStatus: gigData.currentPlanDescription,
-                            newValue: gigData.currentPlanIcon,
-                            planID: gigData.currentPlanID,
-                            bandName: gigData.currentBandName),
+                            userStatus: gigData!.currentPlanDescription,
+                            newValue: gigData!.currentPlanIcon,
+                            planID: gigData!.currentPlanID,
+                            bandName: gigData!.currentBandName),
                         GigComment(
-                            planComment: gigData.currentPlanComment,
-                            planID: gigData.currentPlanID),
+                            planComment: gigData!.currentPlanComment,
+                            planID: gigData!.currentPlanID),
                         Divider(),
                         gigTextHeader("Plans"),
                         Container(margin: EdgeInsets.only(bottom: 20.0)),

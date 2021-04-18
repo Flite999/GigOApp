@@ -74,7 +74,7 @@ class LoginPageState extends State<LoginPage> {
   }
 
   Future authenticate(String email, String pass) async {
-    var url = "https://www.gig-o-matic.com/api/authenticate";
+    var url = Uri.parse("https://www.gig-o-matic.com/api/authenticate");
     try {
       await http.post(url, body: {"email": "$email", "password": "$pass"}).then(
           (response) {
@@ -106,10 +106,10 @@ class LoginPageState extends State<LoginPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     //to-do: randomly got int value for sessionCookie (not sure why), so updated to var to accept either string or int.
     var sessionCookie = (prefs.getString('sessionCookie') ?? 0);
-
+    var url = Uri.parse('https://www.gig-o-matic.com/api/session');
     //check session endpoint for active session with cookie
-    await http.post('https://www.gig-o-matic.com/api/session',
-        headers: {"cookie": "$sessionCookie"}).then((response) {
+    await http
+        .post(url, headers: {"cookie": "$sessionCookie"}).then((response) {
       if (response.statusCode == 200) {
         cleanCookie(response.headers["set-cookie"]);
         saveSessionCookie(globals.cleanedCookie);
@@ -179,7 +179,7 @@ class LoginPageState extends State<LoginPage> {
             filled: true,
             fillColor: Colors.white),
         validator: (value) {
-          if (value.isEmpty) {
+          if (value!.isEmpty) {
             return 'Email can\'t be empty';
           }
           if (value.contains(" ")) {
@@ -197,7 +197,7 @@ class LoginPageState extends State<LoginPage> {
             filled: true,
             fillColor: Colors.white),
         obscureText: true,
-        validator: (value) => value.isEmpty ? 'Password can\'t be empty' : null,
+        validator: (value) => value!.isEmpty ? 'Password can\'t be empty' : null,
         controller: passwordController,
       ),
       const SizedBox(height: 5.0),
@@ -213,7 +213,7 @@ class LoginPageState extends State<LoginPage> {
           shape: new RoundedRectangleBorder(
               borderRadius: new BorderRadius.circular(15.0)),
           onPressed: () {
-            if (formKey.currentState.validate()) {
+            if (formKey.currentState!.validate()) {
               authenticate(emailController.text, passwordController.text);
             }
           }),
