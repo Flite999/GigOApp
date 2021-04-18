@@ -12,15 +12,16 @@ import 'classes.dart';
 //todo: the fetch code is very repeatable/simiar, can consolidate to one function with input params
 
 deserializeJSON(response) {
-  Map decoded = json.decode(response.body.toString());
+  Map? decoded = json.decode(response.body.toString());
   return decoded;
 }
 
-Future<Map> fetchAgenda() async {
-  Map agenda;
+Future<Map?> fetchAgenda() async {
+  Map? agenda;
+  var url = Uri.parse('https://www.gig-o-matic.com/api/agenda');
   try {
-    final response = await http.get('https://www.gig-o-matic.com/api/agenda',
-        headers: {"cookie": "${globals.cleanedCookie}"});
+    final response =
+        await http.get(url, headers: {"cookie": "${globals.cleanedCookie}"});
     if (response.statusCode == 200) {
       cleanCookie(response.headers["set-cookie"]);
       saveSessionCookie(globals.cleanedCookie);
@@ -34,13 +35,12 @@ Future<Map> fetchAgenda() async {
   return agenda;
 }
 
-Future<Map> fetchBandInfo(bandID) async {
-  Map decoded;
-
+Future<Map?> fetchBandInfo(bandID) async {
+  Map? decoded;
+  var url = Uri.parse('https://www.gig-o-matic.com/api/band/$bandID');
   try {
-    final response = await http.get(
-        'https://www.gig-o-matic.com/api/band/$bandID',
-        headers: {"cookie": "${globals.cleanedCookie}"});
+    final response =
+        await http.get(url, headers: {"cookie": "${globals.cleanedCookie}"});
     if (response.statusCode == 200) {
       cleanCookie(response.headers["set-cookie"]);
       saveSessionCookie(globals.cleanedCookie);
@@ -60,8 +60,9 @@ class LogoutTile extends StatelessWidget {
     //async logout function and log out listtile widget both defined here
     //Navigator push method has to be part of the postLogout method to correctly invalidate session cookie
     postLogout() async {
+      var url = Uri.parse('https://www.gig-o-matic.com/api/logout');
       try {
-        await http.post('https://www.gig-o-matic.com/api/logout',
+        await http.post(url,
             headers: {"cookie": "${globals.cleanedCookie}"}).then((response) {
           if (response.statusCode == 200) {
             //posting to the logout returns a cookie in an odd format, but we don't care about properly cleaning it,
@@ -92,8 +93,9 @@ class LogoutTile extends StatelessWidget {
 
 //user can add or update a comment for a gig
 Future postComment(newComment, planID) async {
+  var url = Uri.parse('https://www.gig-o-matic.com/api/plan/$planID/comment');
   try {
-    await http.post('https://www.gig-o-matic.com/api/plan/$planID/comment',
+    await http.post(url,
         headers: {"cookie": "${globals.cleanedCookie}"},
         body: {"comment": "$newComment"}).then((response) {
       if (response.statusCode == 200) {
@@ -111,9 +113,10 @@ Future postComment(newComment, planID) async {
 //user can update their status for a gig
 Future putStatus(newValue, planID) async {
   try {
-    await http.put(
-        'https://www.gig-o-matic.com/api/plan/$planID/value/$newValue',
-        headers: {"cookie": "${globals.cleanedCookie}"}).then((response) {
+    var url = Uri.parse(
+        'https://www.gig-o-matic.com/api/plan/$planID/value/$newValue');
+    await http.put(url, headers: {"cookie": "${globals.cleanedCookie}"}).then(
+        (response) {
       if (response.statusCode == 200) {
         cleanCookie(response.headers["set-cookie"]);
         saveSessionCookie(globals.cleanedCookie);
@@ -126,12 +129,12 @@ Future putStatus(newValue, planID) async {
   }
 }
 
-Future<List> fetchGigMemberInfo(gigID) async {
-  List info;
+Future<List?> fetchGigMemberInfo(gigID) async {
+  List? info;
   try {
-    final response = await http.get(
-        'https://www.gig-o-matic.com/api/gig/plans/$gigID',
-        headers: {"cookie": "${globals.cleanedCookie}"});
+    var url = Uri.parse('https://www.gig-o-matic.com/api/gig/plans/$gigID');
+    final response =
+        await http.get(url, headers: {"cookie": "${globals.cleanedCookie}"});
     if (response.statusCode == 200) {
       cleanCookie(response.headers["set-cookie"]);
       saveSessionCookie(globals.cleanedCookie);
@@ -147,12 +150,12 @@ Future<List> fetchGigMemberInfo(gigID) async {
   return info;
 }
 
-Future<Map> fetchGigDetails(gigID) async {
-  Map json;
+Future<Map?> fetchGigDetails(gigID) async {
+  Map? json;
+  var url = Uri.parse('https://www.gig-o-matic.com/api/gig/${gigID}');
   try {
-    final response = await http.get(
-        'https://www.gig-o-matic.com/api/gig/${gigID}',
-        headers: {"cookie": "${globals.cleanedCookie}"});
+    final response =
+        await http.get(url, headers: {"cookie": "${globals.cleanedCookie}"});
     if (response.statusCode == 200) {
       cleanCookie(response.headers["set-cookie"]);
       saveSessionCookie(globals.cleanedCookie);

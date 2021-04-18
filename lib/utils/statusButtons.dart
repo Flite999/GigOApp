@@ -5,16 +5,16 @@ import 'package:flutter/foundation.dart';
 import 'globals.dart' as globals;
 
 class StatusButtons extends StatefulWidget {
-  final String userStatus;
+  final String? userStatus;
   final newValue;
   final planID;
-  final String bandName;
+  final String? bandName;
   const StatusButtons(
-      {Key key,
-      @required this.userStatus,
-      @required this.newValue,
-      @required this.planID,
-      @required this.bandName})
+      {Key? key,
+      required this.userStatus,
+      required this.newValue,
+      required this.planID,
+      required this.bandName})
       : super(key: key);
   @override
   StatusButtonsState createState() => StatusButtonsState(
@@ -25,22 +25,22 @@ class StatusButtons extends StatefulWidget {
 }
 
 class StatusButtonsState extends State<StatusButtons> {
-  String bandName;
-  String userStatus;
-  Widget newValue;
-  String planID;
+  String? bandName;
+  String? userStatus;
+  Widget? newValue;
+  String? planID;
 
   StatusButtonsState(
       {this.userStatus, this.newValue, this.planID, this.bandName});
 
   statusButtons() {
-    int newStatus;
+    int? newStatus;
     //check if band has simple options turned on
-    bool simpleOptionsOn;
+    bool? simpleOptionsOn;
     try {
-      for (int i = 0; i < globals.bandList.length; i++) {
-        if (bandName == globals.bandList[i].name &&
-            globals.bandList[i].simpleOptions == true) {
+      for (int i = 0; i < globals.bandList!.length; i++) {
+        if (bandName == globals.bandList![i].name &&
+            globals.bandList![i].simpleOptions == true) {
           simpleOptionsOn = true;
         }
       }
@@ -148,7 +148,7 @@ class StatusButtonsState extends State<StatusButtons> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           statusButtons(),
-          new Text(userStatus, style: TextStyle(fontSize: 20.0)),
+          new Text(userStatus!, style: TextStyle(fontSize: 20.0)),
         ],
       ),
     );

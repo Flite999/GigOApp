@@ -2,17 +2,17 @@
 import 'formatTools.dart';
 
 class Gig {
-  String title;
-  String date;
-  String status;
-  String planValue;
-  String planValueLabel;
-  String planComment;
-  String planID;
-  String gigID;
-  String bandID;
-  String bandShortName;
-  String bandLongName;
+  String? title;
+  String? date;
+  String? status;
+  String? planValue;
+  String? planValueLabel;
+  String? planComment;
+  String? planID;
+  String? gigID;
+  String? bandID;
+  String? bandShortName;
+  String? bandLongName;
 
   Gig({
     this.title,
@@ -30,8 +30,8 @@ class Gig {
 }
 
 class Section {
-  String name;
-  String id;
+  String? name;
+  String? id;
 
   Section({
     this.name,
@@ -40,29 +40,29 @@ class Section {
 }
 
 class Band {
-  String name;
-  bool simpleOptions;
+  String? name;
+  bool? simpleOptions;
 
   Band({this.name, this.simpleOptions});
 }
 
 class GigInfo {
-  String gigStatus;
-  String gigBand;
-  String gigContact;
-  String rawDate;
-  String gigDate;
-  String gigCallTime;
-  String gigSetTime;
-  String gigEndTime;
-  String gigAddress;
-  String gigAddressLink;
-  String gigPaid;
-  String gigLeader;
-  String gigPostGig;
-  String gigDetails;
-  String gigTitle;
-  String gigSetList;
+  String? gigStatus;
+  String? gigBand;
+  String? gigContact;
+  String? rawDate;
+  String? gigDate;
+  String? gigCallTime;
+  String? gigSetTime;
+  String? gigEndTime;
+  String? gigAddress;
+  String? gigAddressLink;
+  String? gigPaid;
+  String? gigLeader;
+  String? gigPostGig;
+  String? gigDetails;
+  String? gigTitle;
+  String? gigSetList;
 
   GigInfo(
       {this.gigBand,

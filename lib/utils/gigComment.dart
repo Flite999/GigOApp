@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'apiTools.dart';
 
 class GigComment extends StatefulWidget {
-  final String planComment;
+  final String? planComment;
   final planID;
-  const GigComment({Key key, @required this.planComment, @required this.planID})
+  const GigComment({Key? key, required this.planComment, required this.planID})
       : super(key: key);
 
   @override
@@ -13,17 +13,17 @@ class GigComment extends StatefulWidget {
 }
 
 class GigCommentState extends State<GigComment> with TickerProviderStateMixin {
-  String planComment;
-  String planID;
+  String? planComment;
+  String? planID;
 
   GigCommentState({this.planComment, this.planID});
 
   //for user update on gig status
-  TextEditingController commentController;
+  TextEditingController? commentController;
   @override
   void dispose() {
     // Clean up the controller when the Widget is disposed
-    commentController.dispose();
+    commentController!.dispose();
     super.dispose();
   }
 
@@ -46,8 +46,8 @@ class GigCommentState extends State<GigComment> with TickerProviderStateMixin {
   }
 
   //declare var for check icon animation
-  Animation<double> _fabScale;
-  AnimationController animationController;
+  late Animation<double> _fabScale;
+  late AnimationController animationController;
 
   void initState() {
     //build comment widget
