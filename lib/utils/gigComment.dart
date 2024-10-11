@@ -113,7 +113,7 @@ class GigCommentState extends State<GigComment> with TickerProviderStateMixin {
             : new Container(),
         Container(
           alignment: Alignment.centerLeft,
-          child: FlatButton(
+          child: TextButton(
             onPressed: () {
               //if a comment exists, clicking the button will focus on the textfield
               visibilityComment

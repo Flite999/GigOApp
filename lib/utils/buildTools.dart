@@ -6,13 +6,13 @@ import 'globals.dart' as globals;
 
 Future<GigInfo> buildGigInfo(gigID) async {
   var gigInfo = new GigInfo();
-  Map json = await (fetchGigDetails(gigID) as FutureOr<Map<dynamic, dynamic>>);
+  Map json = await fetchGigDetails(gigID) as Map<dynamic, dynamic>;
   gigInfo = GigInfo.fromJson(json as Map<String, dynamic>);
   return gigInfo;
 }
 
 List<Gig> buildGigFromJSON(plans) {
-  List<Gig> list = new List();
+  List<Gig> list = [];
 
   //Weigh In Plans
   for (int i = 0; i < plans.length; i++) {
@@ -54,12 +54,12 @@ Future<List<Gig>> buildGigList() async {
     await buildBandList();
   }
 
-  Map json = await (fetchAgenda() as FutureOr<Map<dynamic, dynamic>>);
+  Map json = await fetchAgenda() as Map<dynamic, dynamic>;
   List weighinPlans = json["weighin_plans"];
   List upcomingPlans = json["upcoming_plans"];
 
-  List<Gig> weighinPlansList = new List();
-  List<Gig> upcomingPlansList = new List();
+  List<Gig> weighinPlansList = [];
+  List<Gig> upcomingPlansList = [];
 
   weighinPlansList = buildGigFromJSON(weighinPlans);
   upcomingPlansList = buildGigFromJSON(upcomingPlans);
@@ -69,8 +69,8 @@ Future<List<Gig>> buildGigList() async {
 }
 
 List buildGigMemberSectionList(gigMemberList) {
-  List initialList = new List();
-  List finalList = new List();
+  List initialList = [];
+  List finalList = [];
   for (int i = 0; i < gigMemberList.length; i++) {
     initialList.add(gigMemberList[i]['section']);
   }
@@ -82,7 +82,7 @@ List buildGigMemberSectionList(gigMemberList) {
 
 Future<List> buildGigMemberList(gigID) async {
   List gigMemberList = [];
-  List gigMemberInfo = await (fetchGigMemberInfo(gigID) as FutureOr<List<dynamic>>);
+  List gigMemberInfo = await (fetchGigMemberInfo(gigID) as List<dynamic>);
 
   for (int i = 0; i < gigMemberInfo.length; i++) {
     //to-do: this map construction should be abstracted to a class
@@ -149,14 +149,15 @@ void buildSectionList() async {
   List bandIDs = await compileBandIDs();
   List bandSections = [];
   for (int i = 0; i < bandIDs.length; i++) {
-    Map bandSectionMap = await (fetchBandInfo(bandIDs[i]) as FutureOr<Map<dynamic, dynamic>>);
+    Map bandSectionMap =
+        await (fetchBandInfo(bandIDs[i]) as Map<dynamic, dynamic>);
     bandSections.add(bandSectionMap["sections"]);
   }
   //flatten bandSections list
   List flattenedBandSections =
       bandSections.expand((bandSections) => bandSections).toList();
 
-  List<Section> list = new List();
+  List<Section> list = [];
 
   for (int i = 0; i < flattenedBandSections.length; i++) {
     String? name = flattenedBandSections[i]["name"];
@@ -179,7 +180,7 @@ Future buildBandList() async {
     bandList.add(bandMap);
   }
 
-  List<Band> list = new List();
+  List<Band> list = [];
 
   for (int i = 0; i < bandList.length; i++) {
     String? name = bandList[i]["name"];
@@ -192,7 +193,7 @@ Future buildBandList() async {
 
 //need bandIDs from agenda endpoint to correctly reach out to bandSection endpoint
 compileBandIDs() async {
-  final Map agenda = await (fetchAgenda() as FutureOr<Map<dynamic, dynamic>>);
+  final Map agenda = await (fetchAgenda() as Map<dynamic, dynamic>);
   List weighInPlans = agenda["weighin_plans"];
   List upcomingPlans = agenda["upcoming_plans"];
   List compiledBandIDs = [];

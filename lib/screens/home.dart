@@ -81,12 +81,13 @@ class MyHomePageState extends State<MyHomePage> {
                               Container(
                                 alignment: Alignment.centerLeft,
                                 margin: EdgeInsets.only(left: 10.0, right: 5.0),
-                                child: statusIcons(snapshot.data![index].status),
+                                child:
+                                    statusIcons(snapshot.data![index].status),
                               ),
                               Expanded(
                                 child: Container(
                                   alignment: Alignment.centerLeft,
-                                  child: FlatButton(
+                                  child: TextButton(
                                       child: Text(snapshot.data![index].title!,
                                           softWrap: true,
                                           style: TextStyle(
@@ -108,7 +109,8 @@ class MyHomePageState extends State<MyHomePage> {
                                             currentPlanDescription: snapshot
                                                 .data![index].planValueLabel,
                                             currentPlanIcon: planValueIcons(
-                                                snapshot.data![index].planValue),
+                                                snapshot
+                                                    .data![index].planValue),
                                             currentPlanValue:
                                                 snapshot.data![index].planValue,
                                             currentGigTitle:
@@ -148,7 +150,8 @@ class MyHomePageState extends State<MyHomePage> {
                                         snapshot.data![index].planValueLabel,
                                     newValue: planValueIcons(
                                         snapshot.data![index].planValue),
-                                    bandName: snapshot.data![index].bandLongName,
+                                    bandName:
+                                        snapshot.data![index].bandLongName,
                                   ),
                                   new Divider(),
                                 ]),

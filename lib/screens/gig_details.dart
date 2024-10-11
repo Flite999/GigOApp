@@ -87,10 +87,10 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
 
         title: Row(children: [
           Container(
-            child: FlatButton(
+            child: TextButton(
               child: Icon(Icons.arrow_back),
               onPressed: () {
-                return Navigator.push(
+                Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => MyHomePage()),
                 );
@@ -154,18 +154,18 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                               ),
                               new Expanded(
                                   child: new Container(
-                                child: FlatButton(
+                                child: TextButton(
                                   child: Text("${snapshot.data!.gigAddress}",
                                       style: TextStyle(
-                                          color:
-                                              Color.fromRGBO(14, 39, 96, 1.0),
+                                          color: Color.fromRGBO(8, 11, 16, 1),
                                           fontSize: 17.0,
                                           fontWeight: FontWeight.bold)),
                                   onPressed: () async {
-                                    if (await canLaunch(
-                                        "${snapshot.data!.gigAddressLink}")) {
-                                      await launch(
-                                          "${snapshot.data!.gigAddressLink}");
+                                    if (snapshot.data!.gigAddressLink != null &&
+                                        await canLaunchUrl(Uri.parse(
+                                            snapshot.data!.gigAddressLink!))) {
+                                      await launchUrl(Uri.parse(
+                                          snapshot.data!.gigAddressLink!));
                                     }
                                   },
                                 ),

@@ -4,12 +4,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'globals.dart' as globals;
 
 Widget cancelledStatusIconFormatted =
-    Icon(FontAwesomeIcons.solidTimesCircle, size: 25.0, color: Colors.red);
+    Icon(FontAwesomeIcons.solidCircleXmark, size: 25.0, color: Colors.red);
 
 Widget confirmedStatusIconFormatted =
-    Icon(FontAwesomeIcons.solidCheckCircle, size: 25.0, color: Colors.green);
+    Icon(FontAwesomeIcons.solidCircleXmark, size: 25.0, color: Colors.green);
 
-Widget pendingStatusIconFormatted = Icon(FontAwesomeIcons.solidQuestionCircle,
+Widget pendingStatusIconFormatted = Icon(FontAwesomeIcons.solidCircleQuestion,
     size: 25.0, color: Colors.yellow);
 
 Widget needsValuePlanIconFormatted = Icon(
@@ -48,7 +48,7 @@ Widget cantDoItPlanIconFormatted = Icon(
 );
 
 Widget notInterestedPlanIconFormatted = Icon(
-  FontAwesomeIcons.times,
+  FontAwesomeIcons.xmark,
   size: 25.0,
 );
 
@@ -77,17 +77,14 @@ statusIcons(status) {
       {
         return cancelledStatusIconFormatted;
       }
-      break;
     case "1":
       {
         return confirmedStatusIconFormatted;
       }
-      break;
     default:
       {
         return pendingStatusIconFormatted;
       }
-      break;
   }
 }
 
@@ -108,37 +105,30 @@ planValueIcons(value) {
       {
         return needsValuePlanIconFormatted;
       }
-      break;
     case "1":
       {
         return definitelyPlanIconFormatted;
       }
-      break;
     case "2":
       {
         return probablyPlanIconFormatted;
       }
-      break;
     case "3":
       {
         return dontKnowPlanIconFormatted;
       }
-      break;
     case "4":
       {
         return probablyNotPlanIconFormatted;
       }
-      break;
     case "5":
       {
         return cantDoItPlanIconFormatted;
       }
-      break;
     default:
       {
         return notInterestedPlanIconFormatted;
       }
-      break;
   }
 }
 
@@ -159,37 +149,30 @@ planValueLabelGenerator(value) {
       {
         return "Needs Input";
       }
-      break;
     case "1":
       {
         return "Definitely!";
       }
-      break;
     case "2":
       {
         return "Probably";
       }
-      break;
     case "3":
       {
         return "Don't Know";
       }
-      break;
     case "4":
       {
         return "Probably Not";
       }
-      break;
     case "5":
       {
         return "Can't Do It";
       }
-      break;
     default:
       {
         return "Not Interested";
       }
-      break;
   }
 }
 

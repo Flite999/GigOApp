@@ -9,27 +9,28 @@ import '../utils/globals.dart' as globals;
 import '../utils/sessionTools.dart';
 
 launchSignUp() async {
-  const url = "https://www.gig-o-matic.com/signup?locale=en";
-  if (await canLaunch(url)) {
-    await launch(url);
+  final Uri url = Uri.parse("https://www.gig-o-matic.com/signup?locale=en");
+  if (await canLaunchUrl(url)) {
+    await launchUrl(url);
   } else {
     throw 'Could not launch $url';
   }
 }
 
 launchForgotPass() async {
-  const url = "https://www.gig-o-matic.com/forgot?locale=en";
-  if (await canLaunch(url)) {
-    await launch(url);
+  final Uri url = Uri.parse("https://www.gig-o-matic.com/forgot?locale=en");
+  if (await canLaunchUrl(url)) {
+    await launchUrl(url);
   } else {
     throw 'Could not launch $url';
   }
 }
 
 launchEmailWebmaster() async {
-  const url = "mailto:superuser@gig-o-matic.com?subject=App%20Question";
-  if (await canLaunch(url)) {
-    await launch(url);
+  final Uri url =
+      Uri.parse("mailto:superuser@gig-o-matic.com?subject=App%20Question");
+  if (await canLaunchUrl(url)) {
+    await launchUrl(url);
   } else {
     throw 'Could not launch $url';
   }
@@ -62,7 +63,7 @@ class LoginPageState extends State<LoginPage> {
             title: new Text('Login Failed'),
             content: new Text('Please check email and password and try again.'),
             actions: <Widget>[
-              new FlatButton(
+              new TextButton(
                 child: new Text("Close"),
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -197,7 +198,8 @@ class LoginPageState extends State<LoginPage> {
             filled: true,
             fillColor: Colors.white),
         obscureText: true,
-        validator: (value) => value!.isEmpty ? 'Password can\'t be empty' : null,
+        validator: (value) =>
+            value!.isEmpty ? 'Password can\'t be empty' : null,
         controller: passwordController,
       ),
       const SizedBox(height: 5.0),
@@ -206,23 +208,24 @@ class LoginPageState extends State<LoginPage> {
 
   List<Widget> buildSubmitButtons() {
     return [
-      new RaisedButton(
+      new ElevatedButton(
           child: new Text('Login',
               style: new TextStyle(fontSize: 25.0, color: Colors.white)),
-          color: Colors.blue,
-          shape: new RoundedRectangleBorder(
-              borderRadius: new BorderRadius.circular(15.0)),
+          style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(15.0))),
           onPressed: () {
             if (formKey.currentState!.validate()) {
               authenticate(emailController.text, passwordController.text);
             }
           }),
-      new FlatButton(
+      new TextButton(
         child: new Text('Create an Account',
             style: new TextStyle(fontSize: 25.0, color: Colors.black)),
         onPressed: launchSignUp,
       ),
-      new FlatButton(
+      new TextButton(
         child: new Text('Forgot Password?',
             style: new TextStyle(fontSize: 25.0, color: Colors.black)),
         onPressed: launchForgotPass,
@@ -246,7 +249,7 @@ class LoginPageState extends State<LoginPage> {
                       maxLines: 1,
                     ),
                   ),
-                  new FlatButton.icon(
+                  new TextButton.icon(
                     label: new Text(""),
                     icon: new Icon(Icons.email),
                     onPressed: launchEmailWebmaster,
