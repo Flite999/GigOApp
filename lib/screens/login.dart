@@ -9,7 +9,7 @@ import '../utils/globals.dart' as globals;
 import '../utils/sessionTools.dart';
 
 launchSignUp() async {
-  final Uri url = Uri.parse("https://www.gig-o-matic.com/signup?locale=en");
+  final Uri url = Uri.parse("https://www.gig-o-matic.com/member/signup");
   if (await canLaunchUrl(url)) {
     await launchUrl(url);
   } else {
@@ -18,7 +18,8 @@ launchSignUp() async {
 }
 
 launchForgotPass() async {
-  final Uri url = Uri.parse("https://www.gig-o-matic.com/forgot?locale=en");
+  final Uri url =
+      Uri.parse("https://www.gig-o-matic.com/member/member-password-reset/");
   if (await canLaunchUrl(url)) {
     await launchUrl(url);
   } else {
@@ -26,9 +27,9 @@ launchForgotPass() async {
   }
 }
 
-launchEmailWebmaster() async {
+launchSupportEmail() async {
   final Uri url =
-      Uri.parse("mailto:superuser@gig-o-matic.com?subject=App%20Question");
+      Uri.parse("mailto:gigoapp24@gmail.com?subject=App%20Question");
   if (await canLaunchUrl(url)) {
     await launchUrl(url);
   } else {
@@ -74,18 +75,56 @@ class LoginPageState extends State<LoginPage> {
     );
   }
 
-  Future authenticate(String email, String pass) async {
-    var url = Uri.parse("https://www.gig-o-matic.com/api/authenticate");
+  Future getCSRF() async {
+    var url = Uri.parse("https://new.gig-o-matic.com/accounts/login/");
     try {
-      await http.post(url, body: {"email": "$email", "password": "$pass"}).then(
-          (response) {
+      await http.get(url).then((response) {
+        if (response.statusCode == 200) {
+          // Extract the CSRF token from the headers (if it's set in cookies)
+          var setCookieHeader = response.headers['set-cookie'];
+
+          if (setCookieHeader != null &&
+              setCookieHeader.contains('csrftoken=')) {
+            // Extract the token from the 'set-cookie' header
+            var start =
+                setCookieHeader.indexOf('csrftoken=') + 'csrftoken='.length;
+            var end = setCookieHeader.indexOf(';', start);
+            globals.csrfToken =
+                setCookieHeader.substring(start, end); // CSRF token extracted
+            print('Get csrfToken: ${globals.csrfToken}');
+          } else {
+            print('CSRF token not found in cookies');
+          }
+        } else {
+          print('CSRF token could not be retrieved');
+        }
+      });
+    } catch (e) {
+      print('Error');
+    }
+  }
+
+  Future authenticate(String email, String pass) async {
+    var url = Uri.parse("https://new.gig-o-matic.com/accounts/login/");
+    try {
+      await getCSRF();
+      await http.post(url, headers: {
+        "X-CSRFToken": globals.csrfToken,
+        'Cookie': 'csrftoken=${globals.csrfToken}'
+      }, body: {
+        "email": "$email",
+        "password": "$pass"
+      }).then((response) {
         int authenticateReturnCode = response.statusCode;
         if (authenticateReturnCode == 200) {
           cleanCookie(response.headers["set-cookie"]);
+          //print('response: ${response.body}');
+          print('response cookie: ${response.headers["set-cookie"]}');
           saveSessionCookie(globals.cleanedCookie);
           goToHomePage();
         } else {
           print('Login failed. Please check username and password');
+          print('response: ${response.body}');
           _loginFailedDialog();
         }
       });
@@ -107,7 +146,8 @@ class LoginPageState extends State<LoginPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     //to-do: randomly got int value for sessionCookie (not sure why), so updated to var to accept either string or int.
     var sessionCookie = (prefs.getString('sessionCookie') ?? 0);
-    var url = Uri.parse('https://www.gig-o-matic.com/api/session');
+
+    var url = Uri.parse('https://new.gig-o-matic.com/api/session');
     //check session endpoint for active session with cookie
     await http
         .post(url, headers: {"cookie": "$sessionCookie"}).then((response) {
@@ -244,7 +284,7 @@ class LoginPageState extends State<LoginPage> {
                 children: <Widget>[
                   Expanded(
                     child: new AutoSizeText(
-                      "Issues or questions? Contact admins here:",
+                      "Have an issue? Contact support:",
                       style: new TextStyle(fontSize: 25.0),
                       maxLines: 1,
                     ),
@@ -252,7 +292,7 @@ class LoginPageState extends State<LoginPage> {
                   new TextButton.icon(
                     label: new Text(""),
                     icon: new Icon(Icons.email),
-                    onPressed: launchEmailWebmaster,
+                    onPressed: launchSupportEmail,
                   ),
                 ],
               )))

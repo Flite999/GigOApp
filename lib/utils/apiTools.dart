@@ -58,11 +58,11 @@ class LogoutTile extends StatelessWidget {
     //async logout function and log out listtile widget both defined here
     //Navigator push method has to be part of the postLogout method to correctly invalidate session cookie
     postLogout() async {
-      var url = Uri.parse('https://www.gig-o-matic.com/api/logout');
+      var url = Uri.parse('https://new.gig-o-matic.com/accounts/logout');
       try {
-        await http.post(url,
-            headers: {"cookie": "${globals.cleanedCookie}"}).then((response) {
-          if (response.statusCode == 200) {
+        await http.post(url, headers: {"cookie": "${globals.csrfToken}"}).then(
+            (response) {
+          if (response.statusCode == 200 || response.statusCode == 301) {
             //posting to the logout returns a cookie in an odd format, but we don't care about properly cleaning it,
             //because the returned cookie is supposed to be invalid for next use anyways
             cleanCookie(response.headers["set-cookie"]);

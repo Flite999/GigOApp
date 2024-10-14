@@ -6,3 +6,5 @@ late String cleanedCookie;
 late List sectionList;
 //for storing general band info, like simple options. built on home screen
 List? bandList;
+// for storing csrf token
+late String csrfToken;
