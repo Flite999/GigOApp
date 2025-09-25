@@ -3,9 +3,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'globals.dart' as globals;
 
 //save session cookie to memory
-saveSessionCookie(sessionCookie) async {
+saveSessionCookie(csrfToken) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.setString('sessionCookie', sessionCookie);
+  prefs.setString('csrfToken', csrfToken);
 }
 
 //only get all characters up to semicolon

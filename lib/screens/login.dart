@@ -7,35 +7,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'home.dart';
 import '../utils/globals.dart' as globals;
 import '../utils/sessionTools.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-launchSignUp() async {
-  final Uri url = Uri.parse("https://www.gig-o-matic.com/member/signup");
-  if (await canLaunchUrl(url)) {
-    await launchUrl(url);
-  } else {
-    throw 'Could not launch $url';
-  }
-}
-
-launchForgotPass() async {
-  final Uri url =
-      Uri.parse("https://www.gig-o-matic.com/member/member-password-reset/");
-  if (await canLaunchUrl(url)) {
-    await launchUrl(url);
-  } else {
-    throw 'Could not launch $url';
-  }
-}
-
-launchSupportEmail() async {
-  final Uri url =
-      Uri.parse("mailto:gigoapp24@gmail.com?subject=App%20Question");
-  if (await canLaunchUrl(url)) {
-    await launchUrl(url);
-  } else {
-    throw 'Could not launch $url';
-  }
-}
 
 class LoginPage extends StatefulWidget {
   @override
@@ -44,16 +17,27 @@ class LoginPage extends StatefulWidget {
 
 class LoginPageState extends State<LoginPage> {
   //init vars for user input
-  final formKey = new GlobalKey<FormState>();
-  final emailController = new TextEditingController();
-  final passwordController = new TextEditingController();
+  final formKey = GlobalKey<FormState>();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
   //for modal overlay while loading session cookie
   bool isLoading = false;
+  String? baseUrl;
 
+  @override
   void initState() {
     super.initState();
-    isLoading = true;
-    loadSessionCookie();
+    isLoading = false;
+    _initDotenv();
+    //isLoading = true;
+    //loadSessionCookie(); require login for now until I'm sure csrf is working with graphql calls
+  }
+
+  Future<void> _initDotenv() async {
+    await dotenv.load();
+    setState(() {
+      baseUrl = dotenv.env['GIG_O_URL'];
+    });
   }
 
   void _loginFailedDialog() {
@@ -74,9 +58,38 @@ class LoginPageState extends State<LoginPage> {
       },
     );
   }
+  launchSignUp() async {
+    final Uri url = Uri.parse("${baseUrl}/member/signup");
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  launchForgotPass() async {
+    final Uri url =
+        Uri.parse("${baseUrl}/member/member-password-reset/");
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  launchSupportEmail() async {
+    final Uri url =
+        Uri.parse("mailto:gigoapp24@gmail.com?subject=App%20Question");
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
 
   Future getCSRF() async {
-    var url = Uri.parse("https://new.gig-o-matic.com/accounts/login/");
+    var url = Uri.parse("${baseUrl}/accounts/login/");
     try {
       await http.get(url).then((response) {
         if (response.statusCode == 200) {
@@ -100,12 +113,12 @@ class LoginPageState extends State<LoginPage> {
         }
       });
     } catch (e) {
-      print('Error');
+      print('getCSRF error: $e');
     }
   }
 
   Future authenticate(String email, String pass) async {
-    var url = Uri.parse("https://new.gig-o-matic.com/accounts/login/");
+    var url = Uri.parse("${baseUrl}/accounts/login/");
     try {
       await getCSRF();
       await http.post(url, headers: {
@@ -117,6 +130,7 @@ class LoginPageState extends State<LoginPage> {
       }).then((response) {
         int authenticateReturnCode = response.statusCode;
         if (authenticateReturnCode == 200) {
+          print('Login successful');
           cleanCookie(response.headers["set-cookie"]);
           //print('response: ${response.body}');
           print('response cookie: ${response.headers["set-cookie"]}');
@@ -129,7 +143,7 @@ class LoginPageState extends State<LoginPage> {
         }
       });
     } catch (e) {
-      print('Error');
+      print('Authentication error: $e');
     }
   }
 
@@ -141,27 +155,22 @@ class LoginPageState extends State<LoginPage> {
   }
 
   //loadSessionCookie MUST live here for proper user state initialization!
-  void loadSessionCookie() async {
-    //load cookie from memory
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    //to-do: randomly got int value for sessionCookie (not sure why), so updated to var to accept either string or int.
-    var sessionCookie = (prefs.getString('sessionCookie') ?? 0);
+  // void loadSessionCookie() async {
+  //   //load cookie from memory
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   //to-do: randomly got int value for sessionCookie (not sure why), so updated to var to accept either string or int.
+  //   globals.csrfToken = prefs.getString('csrfToken') ?? '';
 
-    var url = Uri.parse('https://new.gig-o-matic.com/api/session');
-    //check session endpoint for active session with cookie
-    await http
-        .post(url, headers: {"cookie": "$sessionCookie"}).then((response) {
-      if (response.statusCode == 200) {
-        cleanCookie(response.headers["set-cookie"]);
-        saveSessionCookie(globals.cleanedCookie);
-        goToHomePage();
-      }
-      //if stored cookie not a valid session, send to login screen
-      setState(() {
-        isLoading = false;
-      });
-    });
-  }
+  //   if (globals.csrfToken != '') {
+  //     goToHomePage();
+  //   } else {
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //   }
+  //   //if stored cookie not a valid session, send to login screen
+  //   //else, send to home screen
+  // }
 
   //to-do: if there is an active login session, login screen flashes briefly before moving to home page-would like to fix that
   @override

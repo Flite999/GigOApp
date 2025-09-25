@@ -25,7 +25,8 @@ Future<Map?> fetchAgenda() async {
       saveSessionCookie(globals.cleanedCookie);
       agenda = deserializeJSON(response);
     } else {
-      print('API call failed, response: ${response.statusCode}');
+      print(
+          'API call failed for fetchAgenda, response: ${response.statusCode}');
     }
   } catch (e) {
     print("fetch Gig Info error: $e");
@@ -43,7 +44,8 @@ Future<Map?> fetchBandInfo(bandID) async {
       cleanCookie(response.headers["set-cookie"]);
       saveSessionCookie(globals.cleanedCookie);
     } else {
-      print('API call failed, response: ${response.statusCode}');
+      print(
+          'API call failed for fetchBandInfo, response: ${response.statusCode}');
     }
     decoded = json.decode(response.body.toString());
   } catch (e) {
@@ -72,7 +74,8 @@ class LogoutTile extends StatelessWidget {
               MaterialPageRoute(builder: (context) => LoginPage()),
             );
           } else {
-            print('API call failed, response: ${response.statusCode}');
+            print(
+                'API call failed for Logout, response: ${response.statusCode}');
           }
         });
       } catch (e) {}
@@ -100,7 +103,8 @@ Future postComment(newComment, planID) async {
         cleanCookie(response.headers["set-cookie"]);
         saveSessionCookie(globals.cleanedCookie);
       } else {
-        print('API call failed, response: ${response.statusCode}');
+        print(
+            'API call failed for postComment, response: ${response.statusCode}');
       }
     });
   } catch (e) {
@@ -119,7 +123,8 @@ Future putStatus(newValue, planID) async {
         cleanCookie(response.headers["set-cookie"]);
         saveSessionCookie(globals.cleanedCookie);
       } else {
-        print('API call failed, response: ${response.statusCode}');
+        print(
+            'API call failed for putStatus, response: ${response.statusCode}');
       }
     });
   } catch (e) {
@@ -138,7 +143,8 @@ Future<List?> fetchGigMemberInfo(gigID) async {
       saveSessionCookie(globals.cleanedCookie);
     } else {
       print('error here');
-      print('API call failed, response: ${response.statusCode}');
+      print(
+          'API call failed for fetchGigMemberInfo, response: ${response.statusCode}');
     }
     //can't use the deserialize function here because the plans endpoint returns a List, not Map
     info = json.decode(response.body.toString());
@@ -159,7 +165,8 @@ Future<Map?> fetchGigDetails(gigID) async {
       saveSessionCookie(globals.cleanedCookie);
       json = deserializeJSON(response);
     } else {
-      print('API call failed, response: ${response.statusCode}');
+      print(
+          'API call failed for fetchGigDetails, response: ${response.statusCode}');
     }
   } catch (e) {
     print(e);
