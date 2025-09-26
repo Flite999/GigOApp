@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'globals.dart' as globals;
+import 'package:intl/intl.dart';
 
 Widget cancelledStatusIconFormatted =
     Icon(FontAwesomeIcons.solidCircleXmark, size: 25.0, color: Colors.red);
@@ -288,4 +289,14 @@ returnSectionName(id) {
       return globals.sectionList[i].name;
     }
   }
+}
+
+formatLocalTime(String time) {
+  DateFormat utcFormat = DateFormat("HH:mm");
+  DateTime utcTime = utcFormat.parse(time, true);
+  DateTime localTime = utcTime.toLocal();
+  DateFormat localFormat = DateFormat("HH:mm a");
+  String formattedLocalTime = localFormat.format(localTime);
+  print("formatted local time: " + formattedLocalTime);
+  return formattedLocalTime;
 }
