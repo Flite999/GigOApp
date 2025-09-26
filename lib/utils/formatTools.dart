@@ -58,9 +58,11 @@ gigTitles(String title) {
 
 //format date for readability
 cleanDate(date) {
+  print("raw date: $date");
   RegExp upToSpace = new RegExp(r".*(?=[ ])");
   String str = date;
   String cleanedDate = upToSpace.stringMatch(str).toString();
+  print("cleaned date: $cleanedDate");
   return cleanedDate;
 }
 

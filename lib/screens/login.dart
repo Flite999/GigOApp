@@ -2,13 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+//import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'home.dart';
 import '../utils/globals.dart' as globals;
 import '../utils/sessionTools.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../utils/initTools.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -22,22 +23,12 @@ class LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
   //for modal overlay while loading session cookie
   bool isLoading = false;
-  String? baseUrl;
+  final baseUrl = dotenv.env['GIG_O_URL'];
 
   @override
   void initState() {
     super.initState();
     isLoading = false;
-    _initDotenv();
-    //isLoading = true;
-    //loadSessionCookie(); require login for now until I'm sure csrf is working with graphql calls
-  }
-
-  Future<void> _initDotenv() async {
-    await dotenv.load();
-    setState(() {
-      baseUrl = dotenv.env['GIG_O_URL'];
-    });
   }
 
   void _loginFailedDialog() {
@@ -58,6 +49,7 @@ class LoginPageState extends State<LoginPage> {
       },
     );
   }
+
   launchSignUp() async {
     final Uri url = Uri.parse("${baseUrl}/member/signup");
     if (await canLaunchUrl(url)) {
@@ -68,8 +60,7 @@ class LoginPageState extends State<LoginPage> {
   }
 
   launchForgotPass() async {
-    final Uri url =
-        Uri.parse("${baseUrl}/member/member-password-reset/");
+    final Uri url = Uri.parse("${baseUrl}/member/member-password-reset/");
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {
@@ -87,64 +78,34 @@ class LoginPageState extends State<LoginPage> {
     }
   }
 
-
-  Future getCSRF() async {
-    var url = Uri.parse("${baseUrl}/accounts/login/");
-    try {
-      await http.get(url).then((response) {
-        if (response.statusCode == 200) {
-          // Extract the CSRF token from the headers (if it's set in cookies)
-          var setCookieHeader = response.headers['set-cookie'];
-
-          if (setCookieHeader != null &&
-              setCookieHeader.contains('csrftoken=')) {
-            // Extract the token from the 'set-cookie' header
-            var start =
-                setCookieHeader.indexOf('csrftoken=') + 'csrftoken='.length;
-            var end = setCookieHeader.indexOf(';', start);
-            globals.csrfToken =
-                setCookieHeader.substring(start, end); // CSRF token extracted
-            print('Get csrfToken: ${globals.csrfToken}');
-          } else {
-            print('CSRF token not found in cookies');
-          }
-        } else {
-          print('CSRF token could not be retrieved');
-        }
-      });
-    } catch (e) {
-      print('getCSRF error: $e');
-    }
-  }
-
   Future authenticate(String email, String pass) async {
-    var url = Uri.parse("${baseUrl}/accounts/login/");
-    try {
-      await getCSRF();
-      await http.post(url, headers: {
-        "X-CSRFToken": globals.csrfToken,
-        'Cookie': 'csrftoken=${globals.csrfToken}'
-      }, body: {
-        "email": "$email",
-        "password": "$pass"
-      }).then((response) {
-        int authenticateReturnCode = response.statusCode;
-        if (authenticateReturnCode == 200) {
-          print('Login successful');
-          cleanCookie(response.headers["set-cookie"]);
-          //print('response: ${response.body}');
-          print('response cookie: ${response.headers["set-cookie"]}');
-          saveSessionCookie(globals.cleanedCookie);
-          goToHomePage();
-        } else {
-          print('Login failed. Please check username and password');
-          print('response: ${response.body}');
-          _loginFailedDialog();
-        }
-      });
-    } catch (e) {
-      print('Authentication error: $e');
-    }
+    // var url = Uri.parse("${baseUrl}/accounts/login/");
+    // try {
+    //   await http.post(url, headers: {
+    //     "X-CSRFToken": globals.csrfToken,
+    //     'Cookie': 'csrftoken=${globals.csrfToken}'
+    //   }, body: {
+    //     "email": "$email",
+    //     "password": "$pass"
+    //   }).then((response) {
+    //     int authenticateReturnCode = response.statusCode;
+    //     if (authenticateReturnCode == 200) {
+    //       print('Login successful');
+    //       cleanCookie(response.headers["set-cookie"]);
+    //       print('response cookie: ${response.headers["set-cookie"]}');
+    //       saveSessionCookie(globals.cleanedCookie);
+    //       goToHomePage();
+    //     } else {
+    //       print('Login failed. Please check username and password');
+    //       print('response: ${response.body}');
+    //       _loginFailedDialog();
+    //     }
+    //   });
+    // } catch (e) {
+    //   print('Authentication error: $e');
+    // }
+    globals.apiKey = "2aCa3b3tpOEpvGKRvRtpNuXPboc7w2Vzl_fetetd";
+    goToHomePage();
   }
 
   goToHomePage() {
@@ -154,24 +115,6 @@ class LoginPageState extends State<LoginPage> {
     );
   }
 
-  //loadSessionCookie MUST live here for proper user state initialization!
-  // void loadSessionCookie() async {
-  //   //load cookie from memory
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   //to-do: randomly got int value for sessionCookie (not sure why), so updated to var to accept either string or int.
-  //   globals.csrfToken = prefs.getString('csrfToken') ?? '';
-
-  //   if (globals.csrfToken != '') {
-  //     goToHomePage();
-  //   } else {
-  //     setState(() {
-  //       isLoading = false;
-  //     });
-  //   }
-  //   //if stored cookie not a valid session, send to login screen
-  //   //else, send to home screen
-  // }
-
   //to-do: if there is an active login session, login screen flashes briefly before moving to home page-would like to fix that
   @override
   Widget build(BuildContext context) {
@@ -179,7 +122,6 @@ class LoginPageState extends State<LoginPage> {
         ? new Scaffold(
             backgroundColor: Colors.white,
             body: new Column(
-              //crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 new Text("Checking for Active Session",

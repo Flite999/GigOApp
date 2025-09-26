@@ -4,28 +4,28 @@ import 'formatTools.dart';
 class Gig {
   String? title;
   String? date;
-  String? status;
-  String? planValue;
-  String? planValueLabel;
-  String? planComment;
-  String? planID;
-  String? gigID;
-  String? bandID;
-  String? bandShortName;
-  String? bandLongName;
+  String? gig_status;
+  // String? planValue;
+  // String? planValueLabel;
+  // String? planComment;
+  // String? planID;
+  String? id;
+  // String? bandID;
+  // String? bandShortName;
+  String? band;
 
   Gig({
     this.title,
     this.date,
-    this.status,
-    this.planValue,
-    this.planValueLabel,
-    this.planComment,
-    this.planID,
-    this.gigID,
-    this.bandID,
-    this.bandShortName,
-    this.bandLongName,
+    this.gig_status,
+    // this.planValue,
+    // this.planValueLabel,
+    // this.planComment,
+    // this.planID,
+    this.id,
+    // this.bandID,
+    // this.bandShortName,
+    this.band,
   });
 }
 
@@ -86,10 +86,10 @@ class GigInfo {
         gigStatus: json["status"].toString(),
         gigBand: json["band"],
         gigContact: json["contact"],
-        gigDate: cleanDate(json["date"]),
-        gigCallTime: json["calltime"],
-        gigSetTime: json["settime"],
-        gigEndTime: json["endtime"],
+        gigDate: json["date"],
+        gigCallTime: json["call_time"],
+        gigSetTime: json["set_time"],
+        gigEndTime: json["end_time"],
         gigAddress: json["address"],
         gigAddressLink: googleMapsAdd(json["address"]),
         gigPaid: json["paid"],

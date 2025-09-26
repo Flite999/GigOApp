@@ -26,13 +26,13 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    buildGigMemberList(gigData!.currentGigID).then((result) {
-      setState(() {
-        memberList = result;
-        //use memberList for critical mass % calculation
-        criticalMassPercent = calculateCriticalMassPercent(memberList);
-      });
-    });
+    // buildGigMemberList(gigData!.currentGigID).then((result) {
+    //   setState(() {
+    //     memberList = result;
+    //     //use memberList for critical mass % calculation
+    //     criticalMassPercent = calculateCriticalMassPercent(memberList);
+    //   });
+    // });
 
     //cache gig details so gig details are fetched once on page init
     fetchedGigDetails = buildGigInfo(gigData!.currentGigID);
@@ -134,8 +134,8 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                           ),
                         ),
                         Divider(),
-                        gigTextBold(criticalMassPercent, "Critical Mass % "),
-                        Divider(),
+                        // gigTextBold(criticalMassPercent, "Critical Mass % "),
+                        // Divider(),
                         gigText(snapshot.data!.gigDate, "Gig Date"),
                         gigText(snapshot.data!.gigCallTime, "Call Time"),
                         gigText(snapshot.data!.gigSetTime, "Set Time"),
@@ -174,102 +174,102 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                           ),
                         ),
                         gigText(snapshot.data!.gigPaid, "Pay"),
-                        gigText(snapshot.data!.gigLeader, "Leader"),
+                        // gigText(snapshot.data!.gigLeader, "Leader"),
                         gigText(snapshot.data!.gigPostGig, "Post-Gig Plans"),
                         Divider(),
                         gigTextHeader("Details"),
                         gigText(snapshot.data!.gigDetails),
                         Divider(),
-                        setListIsExpanded
-                            ? Column(
-                                children: <Widget>[
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      Flexible(
-                                        child: gigTextHeader("SetList"),
-                                      ),
-                                      new RawMaterialButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              setListIsExpanded = false;
-                                            });
-                                          },
-                                          child: new Icon(
-                                            Icons.arrow_drop_down,
-                                            color: Colors.black,
-                                            size: 35.0,
-                                          )),
-                                    ],
-                                  ),
-                                  gigText(snapshot.data!.gigSetList),
-                                ],
-                              )
-                            : Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  Flexible(
-                                    child: gigTextHeader("SetList"),
-                                  ),
-                                  Container(
-                                    child: new RawMaterialButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            setListIsExpanded = true;
-                                          });
-                                        },
-                                        child: new Icon(
-                                          Icons.arrow_drop_up,
-                                          color: Colors.black,
-                                          size: 35.0,
-                                        )),
-                                  ),
-                                ],
-                              ),
+                        // setListIsExpanded
+                        //     ? Column(
+                        //         children: <Widget>[
+                        //           Row(
+                        //             mainAxisAlignment: MainAxisAlignment.start,
+                        //             children: <Widget>[
+                        //               Flexible(
+                        //                 child: gigTextHeader("SetList"),
+                        //               ),
+                        //               new RawMaterialButton(
+                        //                   onPressed: () {
+                        //                     setState(() {
+                        //                       setListIsExpanded = false;
+                        //                     });
+                        //                   },
+                        //                   child: new Icon(
+                        //                     Icons.arrow_drop_down,
+                        //                     color: Colors.black,
+                        //                     size: 35.0,
+                        //                   )),
+                        //             ],
+                        //           ),
+                        //           gigText(snapshot.data!.gigSetList),
+                        //         ],
+                        //       )
+                        //     : Row(
+                        //         mainAxisAlignment: MainAxisAlignment.start,
+                        //         children: <Widget>[
+                        //           Flexible(
+                        //             child: gigTextHeader("SetList"),
+                        //           ),
+                        //           Container(
+                        //             child: new RawMaterialButton(
+                        //                 onPressed: () {
+                        //                   setState(() {
+                        //                     setListIsExpanded = true;
+                        //                   });
+                        //                 },
+                        //                 child: new Icon(
+                        //                   Icons.arrow_drop_up,
+                        //                   color: Colors.black,
+                        //                   size: 35.0,
+                        //                 )),
+                        //           ),
+                        //         ],
+                        //       ),
 
-                        Divider(),
-                        gigTextHeader("Your Status: "),
-                        StatusButtons(
-                            userStatus: gigData!.currentPlanDescription,
-                            newValue: gigData!.currentPlanIcon,
-                            planID: gigData!.currentPlanID,
-                            bandName: gigData!.currentBandName),
-                        GigComment(
-                            planComment: gigData!.currentPlanComment,
-                            planID: gigData!.currentPlanID),
-                        Divider(),
-                        gigTextHeader("Plans"),
-                        Container(margin: EdgeInsets.only(bottom: 20.0)),
-                        //build member list for gig
-                        ListView.builder(
-                          //need the physics property set otherwise you will hit an infinity error and can't scroll up!
-                          physics: ClampingScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: memberList.length,
-                          itemBuilder: (context, index) {
-                            return Container(
-                                margin: EdgeInsets.only(top: 10.0),
-                                decoration: new BoxDecoration(
-                                  borderRadius: new BorderRadius.circular(15.0),
-                                  border: Border.all(
-                                      color: Colors.green,
-                                      width: 2.0,
-                                      style: BorderStyle.solid),
-                                ),
-                                padding: EdgeInsets.only(left: 10.0),
-                                child: Column(children: <Widget>[
-                                  gigTextHeader(
-                                      '${memberList[index]["sectionTitle"]}'),
-                                  buildMembers(memberList[index]["members"]),
-                                ]));
-                          },
-                        ),
+                        // Divider(),
+                        // gigTextHeader("Your Status: "),
+                        // StatusButtons(
+                        //     userStatus: gigData!.currentPlanDescription,
+                        //     newValue: gigData!.currentPlanIcon,
+                        //     planID: gigData!.currentPlanID,
+                        //     bandName: gigData!.currentBandName),
+                        // GigComment(
+                        //     planComment: gigData!.currentPlanComment,
+                        //     planID: gigData!.currentPlanID),
+                        // Divider(),
+                        // gigTextHeader("Plans"),
+                        // Container(margin: EdgeInsets.only(bottom: 20.0)),
+                        // //build member list for gig
+                        // ListView.builder(
+                        //   //need the physics property set otherwise you will hit an infinity error and can't scroll up!
+                        //   physics: ClampingScrollPhysics(),
+                        //   shrinkWrap: true,
+                        //   itemCount: memberList.length,
+                        //   itemBuilder: (context, index) {
+                        //     return Container(
+                        //         margin: EdgeInsets.only(top: 10.0),
+                        //         decoration: new BoxDecoration(
+                        //           borderRadius: new BorderRadius.circular(15.0),
+                        //           border: Border.all(
+                        //               color: Colors.green,
+                        //               width: 2.0,
+                        //               style: BorderStyle.solid),
+                        //         ),
+                        //         padding: EdgeInsets.only(left: 10.0),
+                        //         child: Column(children: <Widget>[
+                        //           gigTextHeader(
+                        //               '${memberList[index]["sectionTitle"]}'),
+                        //           buildMembers(memberList[index]["members"]),
+                        //         ]));
+                        //   },
+                        // ),
                       ],
                     ),
                   ],
                 );
               } else if (snapshot.hasError) {
-                return Text("${snapshot.error}");
+                return Text("Snapshot error: ${snapshot.error}");
               }
               return Center(
                 child: new CircularProgressIndicator(

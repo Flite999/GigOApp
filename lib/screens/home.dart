@@ -11,21 +11,22 @@ import '../utils/gigComment.dart';
 //GigData class for passing data from home screen to gig details page
 class GigData {
   String? currentBandName;
-  String? currentBandID;
-  String? currentPlanComment;
-  String? currentPlanID;
-  String? currentPlanDescription;
-  var currentPlanIcon;
-  String? currentPlanValue;
+  // String? currentBandID;
+  // String? currentPlanComment;
+  // String? currentPlanID;
+  // String? currentPlanDescription;
+  // var currentPlanIcon;
+  // String? currentPlanValue;
   String? currentGigTitle;
   String? currentGigID;
   GigData(
-      {this.currentBandID,
-      this.currentPlanComment,
-      this.currentPlanID,
-      this.currentPlanDescription,
-      this.currentPlanIcon,
-      this.currentPlanValue,
+      {
+      // this.currentBandID,
+      // this.currentPlanComment,
+      // this.currentPlanID,`
+      // this.currentPlanDescription,
+      // this.currentPlanIcon,
+      // this.currentPlanValue,
       this.currentGigID,
       this.currentGigTitle,
       this.currentBandName});
@@ -40,7 +41,7 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     //buildSectionList here for use in rest of the app
-    buildSectionList();
+    // buildSectionList();
     super.initState();
     //calls the gig info once and saves it
     fetchedInfo = buildGigList();
@@ -81,8 +82,8 @@ class MyHomePageState extends State<MyHomePage> {
                               Container(
                                 alignment: Alignment.centerLeft,
                                 margin: EdgeInsets.only(left: 10.0, right: 5.0),
-                                child:
-                                    statusIcons(snapshot.data![index].status),
+                                child: statusIcons(
+                                    snapshot.data![index].gig_status),
                               ),
                               Expanded(
                                 child: Container(
@@ -98,25 +99,25 @@ class MyHomePageState extends State<MyHomePage> {
                                       onPressed: () {
                                         //create a data object here with all the current gig vars and pass to gig details page...todo-explore just using the gig class used for building the gig list instead of the GigData class
                                         final gigData = GigData(
-                                            currentBandName: snapshot
-                                                .data![index].bandLongName,
-                                            currentBandID:
-                                                snapshot.data![index].bandID,
-                                            currentPlanComment: snapshot
-                                                .data![index].planComment,
-                                            currentPlanID:
-                                                snapshot.data![index].planID,
-                                            currentPlanDescription: snapshot
-                                                .data![index].planValueLabel,
-                                            currentPlanIcon: planValueIcons(
-                                                snapshot
-                                                    .data![index].planValue),
-                                            currentPlanValue:
-                                                snapshot.data![index].planValue,
+                                            currentBandName:
+                                                snapshot.data![index].band,
+                                            // currentBandID:
+                                            //     snapshot.data![index].bandID,
+                                            // currentPlanComment: snapshot
+                                            //     .data![index].planComment,
+                                            // currentPlanID:
+                                            //     snapshot.data![index].planID,
+                                            // currentPlanDescription: snapshot
+                                            //     .data![index].planValueLabel,
+                                            // currentPlanIcon: planValueIcons(
+                                            //     snapshot
+                                            //         .data![index].planValue),
+                                            // currentPlanValue:
+                                            //     snapshot.data![index].planValue,
                                             currentGigTitle:
                                                 snapshot.data![index].title,
                                             currentGigID:
-                                                snapshot.data![index].gigID);
+                                                snapshot.data![index].id);
                                         Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -126,9 +127,9 @@ class MyHomePageState extends State<MyHomePage> {
                                       }),
                                 ),
                               ),
-                              Container(
-                                  child: Text(
-                                      "(${snapshot.data![index].bandShortName})")),
+                              // Container(
+                              //     child: Text(
+                              //         "(${snapshot.data![index].bandShortName})")),
                             ]),
                           ),
                           Container(
@@ -144,26 +145,26 @@ class MyHomePageState extends State<MyHomePage> {
                                           fontSize: 15.0,
                                         )),
                                   ),
-                                  StatusButtons(
-                                    planID: snapshot.data![index].planID,
-                                    userStatus:
-                                        snapshot.data![index].planValueLabel,
-                                    newValue: planValueIcons(
-                                        snapshot.data![index].planValue),
-                                    bandName:
-                                        snapshot.data![index].bandLongName,
-                                  ),
+                                  // StatusButtons(
+                                  //   planID: snapshot.data![index].planID,
+                                  //   userStatus:
+                                  //       snapshot.data![index].planValueLabel,
+                                  //   newValue: planValueIcons(
+                                  //       snapshot.data![index].planValue),
+                                  //   bandName:
+                                  //       snapshot.data![index].bandLongName,
+                                  // ),
                                   new Divider(),
                                 ]),
                           ),
                           //interesting behavior here - when comment is entered and you navigate to gig details, the comment is not updated, due to the listview already built. I don't think rebuilding the listview everytime a comment is updated would be great user experience, so will have to keep thinking about this one. Same behavior for statusbuttons as well, of course.
-                          GigComment(
-                              planComment: snapshot.data![index].planComment,
-                              planID: snapshot.data![index].planID)
+                          // GigComment(
+                          //     planComment: snapshot.data![index].planComment,
+                          //     planID: snapshot.data![index].planID)
                         ]));
                   });
             } else if (snapshot.hasError) {
-              return new Text("${snapshot.error}");
+              return new Text("Snapshot error: ${snapshot.error}");
             } else {
               return Center(
                 child: new Column(
@@ -230,7 +231,7 @@ class MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ),
-              LogoutTile(),
+              // LogoutTile(),
               Container(
                 padding: EdgeInsets.only(left: 15.0),
                 alignment: Alignment.bottomLeft,
