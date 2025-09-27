@@ -14,9 +14,7 @@ class MyApp extends StatelessWidget {
     return new MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Gig-O-Matic',
-        theme: new ThemeData(
-          primarySwatch: Colors.green,
-        ),
+        theme: new ThemeData(primarySwatch: Colors.green, fontFamily: 'Lexend'),
         home: new LoginPage());
   }
 }
