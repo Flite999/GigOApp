@@ -138,9 +138,12 @@ class LoginPageState extends State<LoginPage> {
         : new Scaffold(
             appBar: new AppBar(
               automaticallyImplyLeading: false,
-              title: new Text('Gig-O-Matic',
-                  style: new TextStyle(color: Colors.white, fontSize: 35.0)),
-              backgroundColor: Colors.blue,
+              title: Padding(
+                padding: EdgeInsets.only(bottom: 16.0),
+                child: new Text('Gig-❤️-Matic',
+                    style: new TextStyle(color: Colors.white, fontSize: 35.0)),
+              ),
+              backgroundColor: const Color.fromARGB(255, 40, 167, 69),
             ),
             body: new Container(
                 padding: EdgeInsets.all(16.0),
@@ -203,7 +206,7 @@ class LoginPageState extends State<LoginPage> {
           child: new Text('Login',
               style: new TextStyle(fontSize: 25.0, color: Colors.white)),
           style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
+              backgroundColor: Colors.blueAccent,
               shape: new RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(15.0))),
           onPressed: () {
