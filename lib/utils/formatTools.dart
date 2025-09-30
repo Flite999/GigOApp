@@ -191,12 +191,6 @@ googleMapsAdd(str) {
 }
 
 gigText(info, [label]) {
-  var result = "$info";
-
-  if (label != null) {
-    result = "$label: $info";
-  }
-
   return new Container(
     margin: EdgeInsets.all(5.0),
     child: Row(
@@ -204,12 +198,19 @@ gigText(info, [label]) {
       children: <Widget>[
         new Expanded(
             child: new Container(
-          child: new Text(
-            result,
-            softWrap: true,
-            style: TextStyle(fontSize: 20.0),
-          ),
-        ))
+                child: new Row(
+          spacing: 12.0,
+          children: [
+            new Text(label,
+                softWrap: true,
+                style: TextStyle(fontSize: 20.0, color: Colors.black)),
+            new Text(
+              info,
+              softWrap: true,
+              style: TextStyle(fontSize: 20.0, color: Colors.blueGrey),
+            ),
+          ],
+        )))
       ],
     ),
   );
@@ -266,12 +267,18 @@ statusText(status) {
   1 - Confirmed
   2 - Cancelled
   */
-  if (status == "2") {
-    return Text("Cancelled!", style: TextStyle(fontSize: 20.0));
-  } else if (status == "1") {
-    return Text("Confirmed!", style: TextStyle(fontSize: 20.0));
+  if (status == "Cancelled") {
+    return Text("Cancelled!",
+        style: TextStyle(
+          fontSize: 20.0,
+          color: Colors.blueGrey,
+        ));
+  } else if (status == "Confirmed") {
+    return Text("Confirmed!",
+        style: TextStyle(fontSize: 20.0, color: Colors.blueGrey));
   } else {
-    return Text("Pending", style: TextStyle(fontSize: 20.0));
+    return Text("Unconfirmed",
+        style: TextStyle(fontSize: 20.0, color: Colors.blueGrey));
   }
 }
 

@@ -83,12 +83,12 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
         //especially if user has updated status or comment. Disabled default back button and created one
         //that will do so
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.blue,
+        backgroundColor: Color.fromARGB(255, 40, 167, 69),
 
         title: Row(children: [
           Container(
             child: TextButton(
-              child: Icon(Icons.arrow_back),
+              child: Icon(Icons.arrow_back, color: Colors.white, size: 30.0),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -99,10 +99,9 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
           ),
           Expanded(
             child: Container(
-              child: Text(
-                gigData!.currentBandName!,
-                softWrap: true,
-              ),
+              child: Text(gigData!.currentBandName!,
+                  softWrap: true,
+                  style: new TextStyle(color: Colors.white, fontSize: 22.0)),
             ),
           ),
         ]),
@@ -119,7 +118,6 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                     Column(
                       children: <Widget>[
                         gigTextHeader(gigData!.currentGigTitle),
-
                         Container(
                           margin: EdgeInsets.all(10.0),
                           child: Row(
@@ -127,13 +125,15 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                             children: <Widget>[
                               statusIcons(snapshot.data!.gigStatus),
                               Container(
-                                margin: EdgeInsets.only(left: 5.0),
+                                margin: EdgeInsets.only(left: 10.0),
                                 child: statusText(snapshot.data!.gigStatus),
                               ),
                             ],
                           ),
                         ),
+
                         Divider(),
+                        SizedBox(height: 8.0),
                         // gigTextBold(criticalMassPercent, "Critical Mass % "),
                         // Divider(),
                         gigText(snapshot.data!.gigDate, "Gig Date"),
@@ -152,14 +152,14 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                                   style: TextStyle(fontSize: 20.0),
                                 ),
                               ),
-                              new Expanded(
-                                  child: new Container(
+                              Flexible(
                                 child: TextButton(
                                   child: Text("${snapshot.data!.gigAddress}",
+                                      softWrap: true,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
-                                          color: Color.fromRGBO(8, 11, 16, 1),
-                                          fontSize: 17.0,
-                                          fontWeight: FontWeight.bold)),
+                                          color: Colors.blueAccent,
+                                          fontSize: 17.0)),
                                   onPressed: () async {
                                     if (snapshot.data!.gigAddressLink != null &&
                                         await canLaunchUrl(Uri.parse(
@@ -169,7 +169,7 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                                     }
                                   },
                                 ),
-                              ))
+                              )
                             ],
                           ),
                         ),
@@ -177,9 +177,33 @@ class GigDetailsState extends State<GigDetails> with TickerProviderStateMixin {
                         // gigText(snapshot.data!.gigLeader, "Leader"),
                         gigText(snapshot.data!.gigPostGig, "Post-Gig Plans"),
                         Divider(),
-                        gigTextHeader("Details"),
-                        gigText(snapshot.data!.gigDetails),
-                        Divider(),
+                        SizedBox(height: 8.0),
+                        Container(
+                          margin: EdgeInsets.all(5.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              new Expanded(
+                                  child: new Container(
+                                child: new Text(
+                                  "Details",
+                                  softWrap: true,
+                                  style: TextStyle(fontSize: 20.0),
+                                ),
+                              ))
+                            ],
+                          ),
+                        ),
+                        Container(
+                          alignment: Alignment.centerLeft,
+                          margin: EdgeInsets.all(5.0),
+                          child: Text(
+                            snapshot.data!.gigDetails ?? '',
+                            softWrap: true,
+                            style: TextStyle(
+                                fontSize: 20.0, color: Colors.blueGrey),
+                          ),
+                        )
                         // setListIsExpanded
                         //     ? Column(
                         //         children: <Widget>[

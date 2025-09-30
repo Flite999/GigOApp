@@ -146,8 +146,8 @@ class MyHomePageState extends State<MyHomePage> {
                                   child: Text(snapshot.data![index].date!,
                                       softWrap: true,
                                       style: TextStyle(
-                                        fontSize: 15.0,
-                                      )),
+                                          fontSize: 15.0,
+                                          color: Colors.blueGrey)),
                                 ),
                                 // StatusButtons(
                                 //   planID: snapshot.data![index].planID,

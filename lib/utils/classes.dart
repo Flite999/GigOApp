@@ -83,7 +83,7 @@ class GigInfo {
 
   factory GigInfo.fromJson(Map<String, dynamic> json) {
     return GigInfo(
-        gigStatus: json["status"].toString(),
+        gigStatus: json["gig_status"].toString(),
         gigBand: json["band"],
         gigContact: json["contact"],
         gigDate: json["date"],
