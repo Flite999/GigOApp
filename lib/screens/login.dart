@@ -141,7 +141,7 @@ class LoginPageState extends State<LoginPage> {
               title: Padding(
                 padding: EdgeInsets.only(bottom: 16.0),
                 child: new Text('Gig-❤️-Matic',
-                    style: new TextStyle(color: Colors.white, fontSize: 35.0)),
+                    style: new TextStyle(color: Colors.white, fontSize: 36.0)),
               ),
               backgroundColor: const Color.fromARGB(255, 40, 167, 69),
             ),
@@ -149,19 +149,45 @@ class LoginPageState extends State<LoginPage> {
                 padding: EdgeInsets.all(16.0),
                 decoration: new BoxDecoration(
                   image: DecorationImage(
-                      image: new AssetImage('images/tuba.jpg'),
-                      fit: BoxFit.contain,
-                      repeat: ImageRepeat.repeat),
-                  shape: BoxShape.circle,
+                    opacity: 0.35,
+                    colorFilter: ColorFilter.matrix(<double>[
+                      0.2236,
+                      0.7472,
+                      0.0292,
+                      0,
+                      0,
+                      0.0486,
+                      0.9472,
+                      0.0292,
+                      0,
+                      0,
+                      0.0486,
+                      0.7472,
+                      0.2042,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      1,
+                      0,
+                    ]),
+                    image: new AssetImage('images/MA_edited.jpg'),
+                    fit: BoxFit.cover,
+                    //repeat: ImageRepeat.repeat
+                  ),
+                  // shape: BoxShape.circle,
                 ),
                 child: new Form(
                   key: formKey,
                   child: ListView(
-                    children:
-                        buildInputs() + buildSubmitButtons() + buildFooter(),
+                    children: buildInputs() + buildSubmitButtons(),
                   ),
                 )),
-          );
+            bottomSheet: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: buildFooter(),
+            ));
   }
 
   List<Widget> buildInputs() {
@@ -184,7 +210,7 @@ class LoginPageState extends State<LoginPage> {
         },
         controller: emailController,
       ),
-      const SizedBox(height: 5.0),
+      const SizedBox(height: 10.0),
       new TextFormField(
         decoration: new InputDecoration(
             labelText: 'Password',
@@ -196,7 +222,7 @@ class LoginPageState extends State<LoginPage> {
             value!.isEmpty ? 'Password can\'t be empty' : null,
         controller: passwordController,
       ),
-      const SizedBox(height: 5.0),
+      const SizedBox(height: 20.0),
     ];
   }
 
@@ -204,9 +230,9 @@ class LoginPageState extends State<LoginPage> {
     return [
       new ElevatedButton(
           child: new Text('Login',
-              style: new TextStyle(fontSize: 25.0, color: Colors.white)),
+              style: new TextStyle(fontSize: 26.0, color: Colors.white)),
           style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blueAccent,
+              backgroundColor: Color.fromARGB(255, 0, 123, 255),
               shape: new RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(15.0))),
           onPressed: () {
@@ -216,12 +242,12 @@ class LoginPageState extends State<LoginPage> {
           }),
       new TextButton(
         child: new Text('Create an Account',
-            style: new TextStyle(fontSize: 25.0, color: Colors.black)),
+            style: new TextStyle(fontSize: 22.0, color: Colors.black)),
         onPressed: launchSignUp,
       ),
       new TextButton(
         child: new Text('Forgot Password?',
-            style: new TextStyle(fontSize: 25.0, color: Colors.black)),
+            style: new TextStyle(fontSize: 22.0, color: Colors.black)),
         onPressed: launchForgotPass,
       ),
     ];
@@ -229,27 +255,58 @@ class LoginPageState extends State<LoginPage> {
 
   List<Widget> buildFooter() {
     return [
-      new Align(
-          alignment: Alignment.bottomCenter,
-          child: new Container(
-              padding: EdgeInsets.all(20.0),
-              child: new Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Expanded(
-                    child: new AutoSizeText(
-                      "Have an issue? Contact support:",
-                      style: new TextStyle(fontSize: 25.0),
-                      maxLines: 1,
+      new Column(
+        children: [
+          new Align(
+              alignment: Alignment.bottomCenter,
+              child: new Container(
+                  padding: EdgeInsets.fromLTRB(40.0, 0.0, 40.0, 0.0),
+                  child: new Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Expanded(
+                        child: new AutoSizeText(
+                          "Have an issue? Contact support:",
+                          style: new TextStyle(fontSize: 25.0),
+                          maxLines: 1,
+                        ),
+                      ),
+                      new TextButton.icon(
+                        label: new Text(""),
+                        icon: new Icon(Icons.email),
+                        onPressed: launchSupportEmail,
+                      ),
+                    ],
+                  ))),
+          new Align(
+              alignment: Alignment.bottomLeft,
+              child: new Container(
+                padding: EdgeInsets.only(bottom: 30.0),
+                child: new Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Image copyright: '),
+                    GestureDetector(
+                      onTap: () async {
+                        final Uri url =
+                            Uri.parse('https://malixe.smugmug.com/');
+                        if (await canLaunchUrl(url)) {
+                          await launchUrl(url);
+                        }
+                      },
+                      child: Text(
+                        'MalixePhoto',
+                        style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          color: Colors.blue,
+                        ),
+                      ),
                     ),
-                  ),
-                  new TextButton.icon(
-                    label: new Text(""),
-                    icon: new Icon(Icons.email),
-                    onPressed: launchSupportEmail,
-                  ),
-                ],
-              )))
+                  ],
+                ),
+              ))
+        ],
+      )
     ];
   }
 }

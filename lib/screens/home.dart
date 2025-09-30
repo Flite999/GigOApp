@@ -66,102 +66,108 @@ class MyHomePageState extends State<MyHomePage> {
                   itemCount: snapshot.data!.length,
                   itemBuilder: (content, index) {
                     return new Container(
-                        margin: EdgeInsets.only(top: 10.0),
-                        decoration: new BoxDecoration(
-                          borderRadius: new BorderRadius.circular(15.0),
-                          border: Border.all(
-                              color: Colors.green,
-                              width: 2.0,
-                              style: BorderStyle.solid),
-                        ),
-                        child: new Column(children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.only(
-                                top: 15.0, left: 5.0, right: 5.0),
-                            child: new Row(children: [
-                              Container(
+                      padding: EdgeInsets.only(bottom: 16.0),
+                      margin: EdgeInsets.only(top: 2.0, bottom: 10.0),
+                      decoration: new BoxDecoration(
+                        borderRadius: new BorderRadius.circular(15.0),
+                        border: Border.all(
+                            color: Colors.grey,
+                            width: 2.0,
+                            style: BorderStyle.solid),
+                      ),
+                      child: new Column(children: <Widget>[
+                        Container(
+                          margin:
+                              EdgeInsets.only(top: 15.0, left: 5.0, right: 5.0),
+                          child: new Row(children: [
+                            // status icons
+                            Container(
+                              alignment: Alignment.centerLeft,
+                              margin: EdgeInsets.only(left: 10.0, right: 5.0),
+                              child:
+                                  statusIcons(snapshot.data![index].gig_status),
+                            ),
+                            Expanded(
+                              // title
+                              child: Container(
                                 alignment: Alignment.centerLeft,
-                                margin: EdgeInsets.only(left: 10.0, right: 5.0),
-                                child: statusIcons(
-                                    snapshot.data![index].gig_status),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  alignment: Alignment.centerLeft,
-                                  child: TextButton(
-                                      child: Text(snapshot.data![index].title!,
-                                          softWrap: true,
-                                          style: TextStyle(
-                                              color: Color.fromRGBO(
-                                                  14, 39, 96, 1.0),
-                                              fontSize: 19.0,
-                                              fontWeight: FontWeight.bold)),
-                                      onPressed: () {
-                                        //create a data object here with all the current gig vars and pass to gig details page...todo-explore just using the gig class used for building the gig list instead of the GigData class
-                                        final gigData = GigData(
-                                            currentBandName:
-                                                snapshot.data![index].band,
-                                            // currentBandID:
-                                            //     snapshot.data![index].bandID,
-                                            // currentPlanComment: snapshot
-                                            //     .data![index].planComment,
-                                            // currentPlanID:
-                                            //     snapshot.data![index].planID,
-                                            // currentPlanDescription: snapshot
-                                            //     .data![index].planValueLabel,
-                                            // currentPlanIcon: planValueIcons(
-                                            //     snapshot
-                                            //         .data![index].planValue),
-                                            // currentPlanValue:
-                                            //     snapshot.data![index].planValue,
-                                            currentGigTitle:
-                                                snapshot.data![index].title,
-                                            currentGigID:
-                                                snapshot.data![index].id);
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    GigDetails(
-                                                        gigData: gigData)));
-                                      }),
-                                ),
-                              ),
-                              // Container(
-                              //     child: Text(
-                              //         "(${snapshot.data![index].bandShortName})")),
-                            ]),
-                          ),
-                          Container(
-                            padding: EdgeInsets.only(left: 15.0),
-                            child: new Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.only(right: 15.0),
-                                    child: Text(snapshot.data![index].date!,
+                                padding: EdgeInsets.only(left: 8.0),
+                                child: TextButton(
+                                    child: Text(snapshot.data![index].title!,
                                         softWrap: true,
                                         style: TextStyle(
-                                          fontSize: 15.0,
-                                        )),
-                                  ),
-                                  // StatusButtons(
-                                  //   planID: snapshot.data![index].planID,
-                                  //   userStatus:
-                                  //       snapshot.data![index].planValueLabel,
-                                  //   newValue: planValueIcons(
-                                  //       snapshot.data![index].planValue),
-                                  //   bandName:
-                                  //       snapshot.data![index].bandLongName,
-                                  // ),
-                                  new Divider(),
-                                ]),
-                          ),
-                          //interesting behavior here - when comment is entered and you navigate to gig details, the comment is not updated, due to the listview already built. I don't think rebuilding the listview everytime a comment is updated would be great user experience, so will have to keep thinking about this one. Same behavior for statusbuttons as well, of course.
-                          // GigComment(
-                          //     planComment: snapshot.data![index].planComment,
-                          //     planID: snapshot.data![index].planID)
-                        ]));
+                                            color:
+                                                Color.fromRGBO(14, 39, 96, 1.0),
+                                            fontSize: 19.0,
+                                            fontWeight: FontWeight.bold)),
+                                    onPressed: () {
+                                      //create a data object here with all the current gig vars and pass to gig details page...todo-explore just using the gig class used for building the gig list instead of the GigData class
+                                      final gigData = GigData(
+                                          currentBandName:
+                                              snapshot.data![index].band,
+                                          // currentBandID:
+                                          //     snapshot.data![index].bandID,
+                                          // currentPlanComment: snapshot
+                                          //     .data![index].planComment,
+                                          // currentPlanID:
+                                          //     snapshot.data![index].planID,
+                                          // currentPlanDescription: snapshot
+                                          //     .data![index].planValueLabel,
+                                          // currentPlanIcon: planValueIcons(
+                                          //     snapshot
+                                          //         .data![index].planValue),
+                                          // currentPlanValue:
+                                          //     snapshot.data![index].planValue,
+                                          currentGigTitle:
+                                              snapshot.data![index].title,
+                                          currentGigID:
+                                              snapshot.data![index].id);
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => GigDetails(
+                                                  gigData: gigData)));
+                                    }),
+                              ),
+                            ),
+                            // Container(
+                            //     child: Text(
+                            //         "(${snapshot.data![index].bandShortName})")),
+                          ]),
+                        ),
+                        // date
+                        Container(
+                          padding: EdgeInsets.only(left: 15.0),
+                          child: new Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.only(right: 15.0),
+                                  child: Text(snapshot.data![index].date!,
+                                      softWrap: true,
+                                      style: TextStyle(
+                                        fontSize: 15.0,
+                                      )),
+                                ),
+                                // StatusButtons(
+                                //   planID: snapshot.data![index].planID,
+                                //   userStatus:
+                                //       snapshot.data![index].planValueLabel,
+                                //   newValue: planValueIcons(
+                                //       snapshot.data![index].planValue),
+                                //   bandName:
+                                //       snapshot.data![index].bandLongName,
+                                // ),
+                                new Divider(),
+                              ]),
+                        ),
+
+                        //interesting behavior here - when comment is entered and you navigate to gig details, the comment is not updated, due to the listview already built. I don't think rebuilding the listview everytime a comment is updated would be great user experience, so will have to keep thinking about this one. Same behavior for statusbuttons as well, of course.
+                        // GigComment(
+                        //     planComment: snapshot.data![index].planComment,
+                        //     planID: snapshot.data![index].planID)
+                      ]),
+                    );
                   });
             } else if (snapshot.hasError) {
               return new Text("Snapshot error: ${snapshot.error}");
@@ -190,11 +196,11 @@ class MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: new Text("Upcoming Gigs"),
-        backgroundColor: Colors.blue,
-      ),
+          title: new Text("Upcoming Gigs",
+              style: new TextStyle(color: Colors.white, fontSize: 26.0)),
+          backgroundColor: Color.fromARGB(255, 40, 167, 69)),
       body: Container(
-        padding: EdgeInsets.only(left: 10.0, right: 10.0),
+        padding: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 16.0),
         color: Colors.white,
         child: Column(
           children: [
@@ -207,6 +213,7 @@ class MyHomePageState extends State<MyHomePage> {
                             BorderSide(width: 1.0, style: BorderStyle.solid))),
                 child: Column(
                   children: <Widget>[
+                    SizedBox(height: 10.0),
                     gigBuilder(),
                   ],
                 ),
@@ -219,24 +226,25 @@ class MyHomePageState extends State<MyHomePage> {
         width: 200.0,
         child: Drawer(
           child: ListView(
-            padding: EdgeInsets.zero,
+            padding: EdgeInsets.only(bottom: 16.0),
             children: <Widget>[
               Container(
                 height: 120.0,
                 child: DrawerHeader(
+                  padding: EdgeInsets.only(bottom: 16.0),
                   child: Text('Menu',
+                      textAlign: TextAlign.center,
                       style: TextStyle(color: Colors.white, fontSize: 22.0)),
                   decoration: BoxDecoration(
-                    color: Colors.blue,
+                    color: Color.fromARGB(255, 40, 167, 69),
                   ),
                 ),
               ),
               // LogoutTile(),
               Container(
-                padding: EdgeInsets.only(left: 15.0),
-                alignment: Alignment.bottomLeft,
+                alignment: Alignment.center,
                 child:
-                    Text("App Version: 1.5", style: TextStyle(fontSize: 18.0)),
+                    Text("App Version: 3.0", style: TextStyle(fontSize: 18.0)),
               ),
             ],
           ),

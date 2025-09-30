@@ -47,6 +47,7 @@ flutter_icons:
 flutter:
   assets:
     - images/tuba.jpg
+    - images/MA_edited.jpg
     - .env
 
   # The following line ensures that the Material Icons font is

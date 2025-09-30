@@ -8,7 +8,7 @@ Widget cancelledStatusIconFormatted =
     Icon(FontAwesomeIcons.solidCircleXmark, size: 25.0, color: Colors.red);
 
 Widget confirmedStatusIconFormatted =
-    Icon(FontAwesomeIcons.solidCircleXmark, size: 25.0, color: Colors.green);
+    Icon(FontAwesomeIcons.solidCircleCheck, size: 25.0, color: Colors.green);
 
 Widget pendingStatusIconFormatted = Icon(FontAwesomeIcons.solidCircleQuestion,
     size: 25.0, color: Colors.yellow);
@@ -80,7 +80,7 @@ statusIcons(status) {
       {
         return cancelledStatusIconFormatted;
       }
-    case "1":
+    case "Confirmed":
       {
         return confirmedStatusIconFormatted;
       }
